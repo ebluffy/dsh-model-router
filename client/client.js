@@ -663,13 +663,11 @@ window.__ModuleLoader__.load({
 					label = tb.unlimited ? "high ∞" : "high"
 				}
 
-				const isRu = (typeof navigator !== "undefined" && navigator.language && navigator.language.startsWith("ru")) || (state && state.locale === "ru")
 				const title = tb.unlimited
-					? (isRu ? "Осталось: неограниченно" : "Remaining: unlimited")
-					: (isRu
-						? ("Осталось: " + (tb.formattedAvailable || "0") + " токенов")
-						: ((tb.formattedAvailable || "0") + " tokens remaining"))
+					? "Remaining: unlimited tokens"
+					: ("Remaining: " + (tb.formattedAvailable || "0") + " tokens")
 
+				const barPct = typeof tb.progressPercent === "number" ? tb.progressPercent : Math.max(3, Math.min(100, pct))
 				const bar = tb.unlimited ? null : h("span", {
 					style: {
 						display: "inline-block",
@@ -684,7 +682,7 @@ window.__ModuleLoader__.load({
 				}, h("span", {
 					style: {
 						display: "block",
-						width: Math.max(3, Math.min(100, pct)) + "%",
+						width: Math.max(3, Math.min(100, barPct)) + "%",
 						height: "100%",
 						background: color,
 						borderRadius: "2px",

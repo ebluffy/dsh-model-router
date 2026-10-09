@@ -64,7 +64,7 @@ test('normalizeTokenResponse handles exact aihope / New API payload', () => {
   assert.equal(res.totalTokens, 155988220)
   assert.equal(res.usedTokens, 105793880)
   assert.equal(res.unlimited, false)
-  assert.equal(res.level, 'normal')
+  assert.equal(res.level, 'high') // 50M+ tokens is a healthy abundant reserve
   assert.equal(res.isLow, false)
   assert.equal(res.isExhausted, false)
   assert.equal(res.formattedAvailable, '50,194,340')
@@ -72,12 +72,25 @@ test('normalizeTokenResponse handles exact aihope / New API payload', () => {
   assert.ok(Math.abs(res.remainingFraction - 0.3217) < 0.01)
 })
 
-test('normalizeTokenResponse identifies low and exhausted token balances', () => {
-  // Low balance (10% remaining)
+test('normalizeTokenResponse identifies normal, low and exhausted token balances', () => {
+  // Normal balance (25M tokens)
+  const normalSample = {
+    success: true,
+    data: {
+      tokens_available: 25000000,
+      tokens_granted: 100000000,
+      unlimited_quota: false,
+    },
+  }
+  const normRes = normalizeTokenResponse(normalSample)
+  assert.equal(normRes.level, 'normal')
+  assert.equal(normRes.isLow, false)
+
+  // Low balance (< 10M tokens)
   const lowSample = {
     success: true,
     data: {
-      tokens_available: 10000000,
+      tokens_available: 5000000,
       tokens_granted: 100000000,
       unlimited_quota: false,
     },
