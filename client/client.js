@@ -626,8 +626,34 @@ window.__ModuleLoader__.load({
 								? (entry.tags || []).filter((tag) => tag !== "vision")
 								: (entry.tags || []).concat(["vision"]),
 						}),
-					}, t.vision)
+					}, t.vision),
+					quotaBadge(entry.id)
 				)
+			}
+			const quotaBadge = (id) => {
+				if (!state || !state.quotas || !id || !id.startsWith("antigravity/")) return null
+				const slug = id.slice(12).toLowerCase()
+				const family = slug.includes("claude") ? "anthropic" : (slug.includes("gemini") ? "google" : (slug.includes("gpt") ? "openai" : null))
+				if (!family) return null
+				const accounts = state.quotas.accounts || []
+				const acc = accounts.find((a) => a.enabled) || accounts[0]
+				const q = acc && acc.quotas && acc.quotas[family]
+				if (!q || typeof q.remainingFraction !== "number") return null
+				const pct = Math.round(q.remainingFraction * 100)
+				const isLow = q.remainingFraction <= (state.quotas.reserveThreshold || 0.20)
+				return h("span", {
+					className: "mr-tag",
+					title: isLow ? ("Low quota (" + pct + "%): protected by auto-reserve threshold") : ("Remaining 5h quota: " + pct + "%"),
+					style: {
+						color: isLow ? "#f87171" : "#34d399",
+						borderColor: isLow ? "rgba(248, 113, 113, 0.4)" : "rgba(52, 211, 153, 0.4)",
+						borderWidth: "1px",
+						borderStyle: "solid",
+						borderRadius: "4px",
+						padding: "1px 5px",
+						fontWeight: "600",
+					},
+				}, pct + "% quota" + (isLow ? " ⚠️" : ""))
 			}
 			const savePresets = (next, after) => run("/presets", { presets: next }, after)
 			const beginNew = () => { setEditing({ original: null, name: "", match: [], weights: {} }); setCustomWord(""); setView("preset") }

@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.14.7
+
+- **Step-Level Intelligent Routing (3-Tier Action Mapping)**:
+  - Dynamically classifies each step of an agent run according to action type:
+    - *Tool loop, search, file reading, clean commands (`view_file`, `read_file`, `npm run lint/build exit 0`)*: Routed to cheap/fast model (`tier: cheap`, effort: `low`), bypassing hysteresis delay to prevent quota waste.
+    - *Code synthesis, editing, refactoring, and error recovery (`write_to_file`, `replace_file_content`, command failures)*: Routed to smart/strong model (`tier: strong`, effort: `high`).
+    - *Final answer synthesis / complex reasoning*: Routed to top-tier strong model (`tier: strong`, effort: `high/max`).
+- **Quota Awareness & Auto Protection Engine (`lib/quotas.js`)**:
+  - Automatically reads remaining 5-hour and weekly quota telemetry from Antigravity pool (`~/.dsh/agy-accounts/pool.json`).
+  - Implements a reserve threshold (20%): when a model family (e.g. Claude or GPT-OSS) drops below 20%, the router demotes and spares it from routine tasks, automatically diverting to available models with abundant quota.
+  - Automatically excludes models in active cooldown or at exhaustion (<= 2%).
+  - Shows real-time quota telemetry and reserve warning badges in the pool UI.
+
 ## 0.14.6
 
 - Fix duplicate model picker button conflict when theme plugins (such as `dsh-claude-style`) are installed.

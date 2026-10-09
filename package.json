@@ -1,6 +1,6 @@
 {
   "name": "dsh-model-router-en",
-  "version": "0.14.6",
+  "version": "0.14.7",
   "publishConfig": {
     "access": "public"
   },
@@ -11,6 +11,8 @@
     ".": "./lib/index.js",
     "./policy": "./lib/policy.js",
     "./routing": "./lib/routing.js",
+    "./quotas": "./lib/quotas.js",
+    "./step-phase": "./lib/step-phase.js",
     "./config": "./lib/config.js",
     "./client": "./client/client.js",
     "./package.json": "./package.json"
