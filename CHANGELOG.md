@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.14.4
+
+- Parse comma decimals in the price multiplier field for locales that display `0,25`; save them as numeric `0.25`.
+
+
 ## 0.14.3
 
 - Keep the popup inside the viewport, including its padding and border, so header actions remain reachable.

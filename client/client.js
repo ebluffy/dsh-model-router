@@ -569,7 +569,7 @@ window.__ModuleLoader__.load({
 					"data-cost-model": id,
 					onBlur: (event) => {
 						const raw = event.target.value.trim()
-						const value = Number(raw)
+						const value = Number(raw.replace(",", "."))
 						if (raw !== "" && Number.isFinite(value) && value >= 0) {
 							if (value !== entry.cost) patchEntry(id, { cost: value })
 						} else event.target.value = String(entry.cost)
