@@ -98,6 +98,9 @@ test('scores prefer the cheap tier by default and the strong tier for hard work'
   const hard = chooseEntry(pool, c, { stepClass: 'hard', escalations: 0, hasImage: false }, {})
   assert.equal(hard.entry.model, 'deepseek-v4-pro')
 
+  const engineering = chooseEntry(pool, c, { stepClass: 'engineering', escalations: 0, hasImage: false }, {})
+  assert.equal(engineering.entry.model, 'deepseek-v4-pro', 'engineering task selects strong model')
+
   const strong = pool.find((e) => e.tier === 'strong')
   assert.ok(scoreEntry(strong, null, c, { stepClass: 'hard' }) > scoreEntry(strong, null, c, { stepClass: 'standard' }))
 })

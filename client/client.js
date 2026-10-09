@@ -89,6 +89,9 @@ window.__ModuleLoader__.load({
 				priceDone: "updated {n} models \u00b7 {s}",
 				groupAdd: "Add all", groupRemove: "Remove all",
 				groupAddHint: "add every model of this provider to the pool", groupRemoveHint: "remove this provider's models from the pool",
+				autoModeTitle: "Auto (Smart Router)",
+				autoModeDesc: "Dynamically switches models: cheap for light queries, strong for code & engineering",
+				activeBadge: "Active", autoBadge: "Auto", manualBadge: "Manual",
 			},
 		}
 		const dict = () => TEXT.en
@@ -121,6 +124,10 @@ window.__ModuleLoader__.load({
 			".mr-row:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.14))}",
 			".mr-row[data-static=true]{cursor:default}",
 			".mr-row[data-static=true]:hover{background:0 0}",
+			".mr-auto-badge{display:inline-flex;align-items:center;gap:3px;padding:1px 5px;border-radius:4px;background:var(--dsw-alias-interactive-bg-hover,rgba(16,185,129,.15));color:var(--dsw-alias-brand-primary,#10b981);font-weight:600;font-size:11px}",
+			".mr-auto-row{background:var(--dsw-alias-interactive-bg-hover,rgba(16,185,129,.08));border-radius:var(--dsw-radius-md,8px);margin-bottom:4px}",
+			".mr-auto-row:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(16,185,129,.16))}",
+			".mr-auto-tag{display:inline-flex;align-items:center;padding:1px 5px;border-radius:4px;font-size:10px;font-weight:500;background:var(--dsw-alias-bg-module-platform,rgba(127,127,127,.12));color:var(--dsw-alias-brand-primary,#10b981)}",
 			".mr-body{display:flex;flex-direction:column;gap:2px;padding:2px 8px 6px 34px}",
 			".mr-check{flex:0 0 14px;display:grid;place-items:center;color:var(--dsw-alias-label-primary,#e8e8ea)}",
 			".mr-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
@@ -387,6 +394,7 @@ window.__ModuleLoader__.load({
 			// never opens, and an unavailable (subagent-addressed) one renders nothing.
 			const locked = !!(props && props.locked)
 			if (props && props.available === false) return null
+			if (props && props.fallbackChip === true && !props.directory) return null
 
 			const run = (path, body, after) => {
 				setBusy(true)
@@ -416,7 +424,7 @@ window.__ModuleLoader__.load({
 						? {
 							bottom: Math.max(8, window.innerHeight - rect.top + 8),
 							right: Math.max(8, window.innerWidth - rect.right),
-							maxHeight: Math.max(0, Math.min(window.innerHeight - 16, rect.top - 16)),
+							maxHeight: Math.max(160, Math.min(520, rect.top - 16)),
 						}
 						: null)
 					load()
@@ -715,6 +723,7 @@ window.__ModuleLoader__.load({
 				if (!props || typeof props.select !== "function") return
 				const same = !!(officialCurrent && officialCurrent.provider === provider && officialCurrent.model === modelId)
 				if (same) { setOpen(false); return }
+				api("/disengage", { method: "POST", body: { sessionId: sessionId } }).catch(() => {})
 				setError("")
 				settleSelection(props.select({ provider: provider, model: modelId }), () => setOpen(false))
 			}
@@ -728,6 +737,7 @@ window.__ModuleLoader__.load({
 				settleSelection(props.select(selection), () => setOpen(false))
 			}
 
+			const isAutoActive = !yielded && state && state.engaged !== false
 			const parts = [
 				h("button", {
 					key: "trigger", type: "button", className: "mr-trigger", ref: triggerRef,
@@ -735,13 +745,16 @@ window.__ModuleLoader__.load({
 					"data-mr-surface": props && props.fallbackChip === true ? "chip" : "seat",
 					disabled: locked ? true : undefined,
 					"aria-busy": officialBusy ? "true" : undefined,
-					title: t.title + " · " + (t[mode] || mode) + " · " + (yielded ? t.yieldedHint : t.engagedHint) +
+					title: (isAutoActive ? "⚡ Auto Router · " : "") + t.title + " · " + (t[mode] || mode) + " · " + (yielded ? t.yieldedHint : t.engagedHint) +
 					(seated
 						? (official ? " — " + officialTriggerLabel : "")
 						: (current ? " — " + current.provider + "/" + current.model + " · " + currentEffort + " · " + (current.stepClass || "") : "")) +
 					(needsConfirm ? " · " + t.confirmAttn : ""),
 					onClick: openPanel,
 				},
+					(seated && isAutoActive
+						? h("span", { className: "mr-auto-badge", title: t.autoModeDesc }, "⚡ " + t.autoBadge)
+						: null),
 					seated
 						? h("span", null, officialModelLabel)
 						: h("span", null, t[mode] || mode),
@@ -917,6 +930,33 @@ window.__ModuleLoader__.load({
 					// --- Official half, on top: the session model and its reasoning effort ---
 					if (seated) {
 						const officialBody = []
+						officialBody.push(h("div", {
+							key: "auto-router-row", className: "mr-row mr-auto-row", style: { padding: "4px 8px", marginBottom: "4px" }
+						},
+							h("button", {
+								type: "button", className: "mr-pick", role: "menuitemradio",
+								"aria-checked": isAutoActive ? "true" : "false",
+								disabled: busy, "data-router-auto": "true",
+								title: t.autoModeDesc,
+								onClick: () => {
+									if (!isAutoActive) {
+										run("/resume", { sessionId: sessionId }, () => {
+											load()
+											setOpen(false)
+										})
+									} else {
+										setOpen(false)
+									}
+								},
+							},
+								h("span", { className: "mr-check" }, isAutoActive ? h(Icon, { name: "check" }) : null),
+								h("span", { className: "mr-name", style: { fontWeight: "600", display: "flex", alignItems: "center", gap: "6px" } },
+									h("span", { style: { color: "var(--dsw-alias-brand-primary, #10b981)" } }, "⚡"),
+									t.autoModeTitle
+								),
+								h("span", { className: "mr-auto-tag" }, isAutoActive ? t.activeBadge : t.autoBadge)
+							)
+						))
 						officialBody.push(h("div", { key: "official-model-title", className: "mr-group" }, effortMode ? t.effortModelTitle : t.officialModel))
 						if (effortMode && effortPending) {
 							officialBody.push(h("div", { key: "effort-pick", className: "mr-note", style: { padding: "0 8px 4px" } },
@@ -1267,7 +1307,7 @@ window.__ModuleLoader__.load({
 					style: {
 						bottom: pos ? pos.bottom : 96,
 						right: pos ? pos.right : 24,
-						maxHeight: pos ? pos.maxHeight : "72vh",
+						maxHeight: pos ? Math.min(pos.maxHeight, 520) : "min(72vh, 520px)",
 						background: useThemeBg ? undefined : (solidBg || undefined),
 					},
 					onMouseDown: (event) => event.stopPropagation(),
