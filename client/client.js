@@ -188,6 +188,8 @@ window.__ModuleLoader__.load({
 			".mr-call{display:flex;align-items:center;gap:4px;max-width:100%;padding:0 2px;color:var(--dsw-alias-label-caption,#8b9096);font-size:11px;line-height:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
 			".mr-call-model{min-width:0;color:var(--dsw-alias-label-secondary,#a2a8b0);overflow:hidden;text-overflow:ellipsis}",
 			".mr-call-eff{flex:none}",
+			".dsh-claude-model-btn,[data-slot=\"conversation.input.model\"]>.dsh-claude-model-btn{display:none!important}",
+			"[data-slot=\"conversation.input.model\"]>[data-dsh-claude-model-host]{display:inline-flex!important}",
 		].join("")
 
 		function ensureStyles() {
@@ -379,6 +381,18 @@ window.__ModuleLoader__.load({
 					console.info("[model-router] composer control ready (session " + (sessionId || "none") + ")")
 				}
 			}, [])
+			react.useEffect(() => {
+				if (typeof document !== "undefined" && typeof document.querySelectorAll === "function") {
+					const dupes = document.querySelectorAll(".dsh-claude-model-btn")
+					for (let i = 0; i < dupes.length; i++) {
+						try { dupes[i].remove() } catch (_e) {}
+					}
+					const hosts = document.querySelectorAll("[data-dsh-claude-model-host]")
+					for (let i = 0; i < hosts.length; i++) {
+						hosts[i].removeAttribute("data-dsh-claude-model-host")
+					}
+				}
+			})
 			react.useEffect(() => {
 				if (!open) return undefined
 				const onDown = (event) => {
