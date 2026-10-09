@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.3
+
+- Keep the popup inside the viewport, including its padding and border, so header actions remain reachable.
+- Add an exact relative-cost input alongside the quick low/mid/high choices. Accept decimals and zero for free models; manual values survive automatic pricing.
+- Add a regression test for manual decimal and zero prices.
+
 ## English Fork
 
 - Package identity: `dsh-model-router-en`, based on upstream version 0.14.2.

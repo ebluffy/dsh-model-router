@@ -99,7 +99,7 @@ unpools that model, a pooled row expands its Role / Price / Vision controls unde
 whose provider group is not in the directory gather under Other models with the manual
 "type a model id" row. **Rows are grouped by provider**, each group header carrying Add all and
 Remove all, and the panel head carries Auto price and Fetch prices to fill
-the Cheap / Medium / Expensive cost level of entries you have not labelled by hand. Then Task presets and More. Every mutation goes to the host over same-origin
+the Cheap / Medium / Expensive cost level of entries you have not labelled by hand. The numeric Price field accepts exact relative multipliers such as `0.25`, `1.45`, or `0` for free models; press Enter or leave the field to save. Manual prices are not overwritten by Auto price or Fetch prices. These multipliers are routing penalties, not dollar prices or quota limits. Provider quota usage is not tracked. Then Task presets and More. Every mutation goes to the host over same-origin
 `/model-router/*` routes, and the per-call route row in the conversation is unchanged.
 
 The old `conversation.input.right` chip (`model-router:composer-control`, order 20) is still registered,

@@ -35,7 +35,7 @@ window.__ModuleLoader__.load({
 				tierHint: "daily = use it all the time; heavy = prefer it for hard/engineering steps (hard +15, engineering +8)",
 				cheapHint: "daily: preferred by default, saves money",
 				strongHint: "heavy: preferred once a step turns hard or evidence of trouble appears",
-				costHint: "your own relative price: the dearer it is, the harder the step must be to pick it (1/4/8 deduct 0.4 / 1.6 / 3.2)",
+				costHint: "Relative cost multiplier; decimals and 0 for free models are allowed. Each 1x subtracts 0.4 routing points. Manual prices are kept by Auto price.",
 				price1: "low", price4: "mid", price8: "high",
 				visionHint: "image steps prefer this model (+25)",
 				scopeHint: "what the router may change: Model+Effort = model + effort; Effort = only the thinking level of the one model you pick; Model = model only",
@@ -109,8 +109,10 @@ window.__ModuleLoader__.load({
 			".mr-trigger:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.14));color:var(--dsw-alias-label-primary,#e8e8ea)}",
 			".mr-dot{width:6px;height:6px;border-radius:50%;flex:none;background:var(--dsw-alias-state-success-primary,#3fb950)}",
 			".mr-dot[data-yielded=true]{background:var(--dsw-alias-state-warn-label,#d29922)}",
-			".mr-panel{position:fixed;z-index:2147483000;width:372px;max-height:min(72vh,540px);overflow:auto;padding:6px;border-radius:var(--dsw-radius-lg,12px);background:var(--dsw-specific-menu,#232326);color:var(--dsw-alias-label-primary,#e8e8ea);box-shadow:var(--dsw-elevation-prominent,0 16px 48px rgba(0,0,0,.45));border:1px solid var(--dsw-alias-border-l1,rgba(127,127,127,.22));font-size:13px;line-height:20px;scrollbar-width:thin}",
+			".mr-panel{position:fixed;z-index:2147483000;box-sizing:border-box;width:min(372px,calc(100vw - 16px));max-height:min(72vh,540px);overflow-y:auto;overflow-x:hidden;padding:6px;border-radius:var(--dsw-radius-lg,12px);background:var(--dsw-specific-menu,#232326);color:var(--dsw-alias-label-primary,#e8e8ea);box-shadow:var(--dsw-elevation-prominent,0 16px 48px rgba(0,0,0,.45));border:1px solid var(--dsw-alias-border-l1,rgba(127,127,127,.22));font-size:13px;line-height:20px;scrollbar-width:thin}",
 			".mr-panel::-webkit-scrollbar{width:8px}",
+			".mr-cost{display:inline-flex;align-items:center;gap:3px;color:var(--dsw-alias-label-caption,#8b9096)}",
+			".mr-cost input{box-sizing:border-box;width:64px;min-width:0;height:24px;padding:2px 4px;border:1px solid var(--dsw-alias-border-l1,rgba(127,127,127,.2));border-radius:4px;background:var(--dsw-specific-field,#19191c);color:var(--dsw-alias-label-primary,#e8e8ea);font:inherit;font-size:11px}",
 			".mr-panel::-webkit-scrollbar-thumb{background:var(--dsw-alias-scrollbar-bg-l2,rgba(127,127,127,.3));border-radius:4px}",
 			".mr-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:6px;padding:4px 8px 6px;background:inherit;color:var(--dsw-alias-label-tertiary,#8b9096);font-size:11px;letter-spacing:.02em}",
 			".mr-panel[data-bg=theme]{-webkit-backdrop-filter:blur(22px) saturate(1.15);backdrop-filter:blur(22px) saturate(1.15)}",
@@ -414,7 +416,7 @@ window.__ModuleLoader__.load({
 						? {
 							bottom: Math.max(8, window.innerHeight - rect.top + 8),
 							right: Math.max(8, window.innerWidth - rect.right),
-							maxHeight: Math.max(260, rect.top - 16),
+							maxHeight: Math.max(0, Math.min(window.innerHeight - 16, rect.top - 16)),
 						}
 						: null)
 					load()
@@ -486,7 +488,7 @@ window.__ModuleLoader__.load({
 				if (packed.indexOf(id) >= 0) savePool(pool.filter((entry) => entry.id !== id))
 				else savePool(pool.concat([{ id: id, tier: "cheap", cost: 1, tags: [] }]))
 			}
-			const patchEntry = (id, patch) => savePool(pool.map((entry) => (entry.id === id ? Object.assign({}, entry, patch) : entry)))
+			const patchEntry = (id, patch) => savePool(pool.map((entry) => (entry.id === id ? Object.assign({}, entry, patch, Object.prototype.hasOwnProperty.call(patch, "cost") ? { costSource: "manual" } : {}) : entry)))
 			const addModel = () => {
 				const id = customModel.trim()
 				setCustomModel("")
@@ -560,6 +562,21 @@ window.__ModuleLoader__.load({
 					onClick: () => toggleModel(id),
 				}, t.pool)
 			}
+			const costInput = (id, entry) => h("label", { className: "mr-cost", title: t.costHint },
+				h("input", {
+					key: id + "-" + entry.cost, type: "number", min: 0, step: "any",
+					defaultValue: entry.cost, disabled: busy, "aria-label": "Price multiplier for " + id,
+					"data-cost-model": id,
+					onBlur: (event) => {
+						const raw = event.target.value.trim()
+						const value = Number(raw)
+						if (raw !== "" && Number.isFinite(value) && value >= 0) {
+							if (value !== entry.cost) patchEntry(id, { cost: value })
+						} else event.target.value = String(entry.cost)
+					},
+					onKeyDown: (event) => { if (event.key === "Enter") event.target.blur() },
+				}),
+				h("span", { "aria-hidden": true }, "\u00d7"))
 			/** The tier/cost/vision line under a row, shown once the model is in the pool. */
 			const poolOptions = (id) => {
 				const entry = pool.find((candidate) => candidate.id === id)
@@ -574,6 +591,7 @@ window.__ModuleLoader__.load({
 						],
 					}),
 					h("span", { className: "mr-tag", title: t.costHint }, t.cost),
+					costInput(entry.id, entry),
 					h(Segmented, {
 						title: t.costHint, disabled: busy, value: entry.cost, onChange: (value) => patchEntry(id, { cost: Number(value) }),
 						options: COSTS.map((value) => ({ value: value, label: t["price" + value] || String(value) })),
@@ -1115,6 +1133,7 @@ window.__ModuleLoader__.load({
 										],
 									}),
 									h("span", { className: "mr-tag", title: t.costHint }, t.cost),
+					costInput(entry.id, entry),
 									h(Segmented, {
 										title: t.costHint, disabled: busy, value: entry.cost, onChange: (value) => patchEntry(model.id, { cost: Number(value) }),
 										options: COSTS.map((value) => ({ value: value, label: t["price" + value] || String(value) })),

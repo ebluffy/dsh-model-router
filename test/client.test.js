@@ -871,6 +871,22 @@ test('the seated panel folds the pool into the model rows instead of a second li
   assert.deepEqual(plain(app.net.posts('/model-router/pool').pop().body), { pool: [] })
 })
 
+test('manual cost input posts exact decimals and zero with manual provenance', async () => {
+  for (const value of ['0.25', '0']) {
+    const id = 'deepseek-official/deepseek-v4-pro'
+    const state = { effectiveControl: 'full', engaged: true, pool: [{ id, tier: 'cheap', cost: 1, tags: [] }], presets: {}, settings: {}, decisions: [] }
+    const app = await openControl({ state })
+    openPanel(app.holder)
+    await app.rt.flush()
+    const input = byProp(app.holder.tree, 'data-cost-model', id)[0]
+    input.props.onBlur({ target: { value } })
+    await app.rt.flush()
+    const entry = app.net.posts('/model-router/pool').pop().body.pool[0]
+    assert.equal(entry.cost, Number(value))
+    assert.equal(entry.costSource, 'manual')
+  }
+})
+
 /** The state a fresh conversation sees: the last plan, inherited and unconfirmed. */
 function planningState(overrides = {}) {
   return Object.assign({
