@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.14.5
+
+- Unified Cursor-style model picker and Auto router control in `conversation.input.model`: displays `⚡ Auto` badge when dynamic routing is active, and provides a top `⚡ Auto (Smart Router)` row in the dropdown.
+- Suppressed duplicate fallback chip in input bar.
+- Disengage dynamic routing on explicit manual model selection and re-engage when Auto is selected.
+- Rebalanced scoring weights (`cheapBase: 50, strongBase: 45, engineeringBonus: 20`) so coding tasks reliably select strong tier models over cheap ones.
+- Added Russian language coding and engineering vocabulary to the semantic task classifier.
+- Capped popup menu to `maxHeight: 520px` with internal scrolling to prevent viewport overflow.
+
 ## 0.14.4
 
 - Parse comma decimals in the price multiplier field for locales that display `0,25`; save them as numeric `0.25`.
