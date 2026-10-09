@@ -1,8 +1,8 @@
-# Publish @neptune810/dsh-model-router with npm Trusted Publishing (OIDC).
+# Publish dsh-model-router-en with npm Trusted Publishing (OIDC).
 #
 # One-time setup on npmjs.com — the package -> Settings -> Trusted Publishing:
 #   Provider             GitHub Actions
-#   Organization or user Neptune810
+#   Organization or user ebluffy
 #   Repository           dsh-model-router
 #   Workflow filename    publish.yml
 #   Environment name     (leave empty)

@@ -9,7 +9,7 @@
  * instead of native selects.
  */
 window.__ModuleLoader__.load({
-	id: "@neptune810/dsh-model-router",
+	id: "dsh-model-router-en",
 	factory: (require) => {
 		var module = { exports: {} }
 		var exports = module.exports
@@ -25,71 +25,6 @@ window.__ModuleLoader__.load({
 
 
 		const TEXT = {
-			zh: {
-				title: "模型路由", scope: "控制范围", full: "模型+思考", effort: "思考", model: "模型",
-				engaged: "已接管", yielded: "已让位，你手动选过", resume: "重新接管",
-				engagedHint: "绿点 = 正在自动接管：按需要换模型、调思考等级；点开可调整",
-				yieldedHint: "黄点 = 已让位：你手动选过模型，插件暂时不插手；点开可点「重新接管」",
-				task: "任务类型", auto: "自动（按关键词规则）", pool: "模型池", poolHint: "只有勾选的模型会被选中",
-				tier: "定位", cheap: "日常", strong: "攻坚", cost: "价格", vision: "视觉",
-				tierHint: "日常 = 平时就用它；攻坚 = 只在硬活/工程活时优先（hard +15 分、工程 +8 分）",
-				cheapHint: "日常：平时优先用它，省钱",
-				strongHint: "攻坚：任务变难、或工具报错等证据出现时才优先",
-				costHint: "相对价格，随你标：越贵越要任务够硬才选得中（1/4/8 分别扣 0.4 / 1.6 / 3.2 分）",
-				price1: "便宜", price4: "中", price8: "贵",
-				visionHint: "带图任务优先选它（+25 分）",
-				scopeHint: "插件能改什么：模型+思考 = 模型 + 思考等级；思考 = 只调选中的那一个模型的思考等级；模型 = 只调模型",
-				pickModel: "先选一个模型",
-				effortModelTitle: "思考模式只作用于一个模型",
-				effortModelHint: "在下面选中唯一一个模型，插件只调它的思考等级；没选之前不接管",
-				effortBound: "已绑定", effortBind: "接管", poolOther: "其他模型",
-				effortDefault: "默认",
-				officialModel: "本会话模型", officialEffort: "推理等级",
-				officialFallback: "请选择模型", officialLoading: "正在加载模型…",
-				officialRefreshing: "正在刷新模型列表…", officialRetry: "重新加载",
-				officialDefault: "默认（供应商）", officialAccount: "DeepSeek 账号",
-				officialEmpty: "没有可用的模型", officialEmptyEfforts: "该模型没有推理等级",
-				officialError: "模型操作失败", officialFailure: "供应商目录加载失败",
-				taskHint: "自动 = 按你写的关键词规则判断；也可以强制指定一个类型",
-				poolHint2: "勾选可被路由的模型，只有勾选的会被选中；思考模式下改为只选唯一一个",
-				imagesHint: "带图步骤：不干预 = 按普通规则；用视觉模型 = 强制走带视觉标记的模型",
-				classifierHint: "任务识别：关键词 = 按预设里的 match；语义 = 每轮一次小模型判断",
-				pressureHint: "上下文压力：快满时优先用便宜模型",
-				bg: "面板背景", bgSolid: "不透明", bgTheme: "跟随主题",
-				bgHint: "半透明的主题菜单色会让背后的聊天内容透上来；选「不透明」最好读，选「跟随主题」会加毛玻璃模糊",
-				bgSolidHint: "用主题底色算出不透明色，文字最清楚",
-				bgThemeHint: "沿用主题的半透明菜单色，再加背景模糊",
-				fullHint: "模型和思考等级都交给插件", effortHint: "只调你在下面选中的那一个模型的思考等级；没选之前不接管", modelHint: "只让插件换模型，思考等级不动",
-				presets: "任务预设", newPreset: "新建预设", edit: "编辑", remove: "删除",
-				name: "名称", keywords: "关键词", add: "添加", custom: "自定义词，回车添加",
-				weights: "各模型权重", none: "不参与", save: "保存", cancel: "取消", back: "返回",
-				more: "更多", images: "带图步骤", keepImages: "不干预", toVision: "用视觉模型",
-				classifier: "任务识别", byRules: "关键词", byLlm: "语义",
-				pressure: "上下文压力", on: "快满省", off: "关",
-				noPresets: "还没有预设", current: "当前", loading: "读取中…", empty: "没有可选项",
-				noSession: "新会话还没建立：这里的选择会成为默认值，发出第一条消息后按会话生效",
-				confirmNew: "新对话：先确认这次的路由方案",
-				confirmInherited: "已沿用上一次的选择",
-				confirmScope: "范围", confirmModel: "思考模型", confirmTask: "任务类型", confirmPool: "模型池",
-				confirmAction: "确认", confirmCount: "个",
-				confirmNone: "未指定", confirmAuto: "自动",
-				confirmHint: "确认后本对话不再提示；改范围 / 模型 / 任务类型 / 模型池会重新提示",
-				confirmAttn: "新对话待确认路由方案",
-				recent: "最近决策", turnShort: "轮",
-				needName: "先给任务类型起个名字", session: "会话",
-				poolAdd: "手动填模型 ID", delete: "删",
-				crossTitle: "跨品牌切换", crossPropose: "这一步想换到另一个品牌",
-				crossOnce: "只切一次", crossAllow: "本会话允许", crossNever: "不再跨品牌",
-				crossHint: "跨品牌比同品牌换模型影响大：默认先经你确认；「只切一次」只放行这一次",
-				crossSetting: "跨品牌", crossAllowLabel: "允许", crossConfirmLabel: "先问", crossNeverLabel: "禁止",
-				crossSettingHint: "插件能不能把本会话切到别的模型品牌：允许 = 直接切；先问 = 先弹确认；禁止 = 始终留在原品牌",
-				autoPrice: "自动定价", autoPriceHint: "用内置规则给没手标的模型填「便宜/中/贵」",
-				netPrice: "联网定价", netPriceHint: "先从 OpenRouter 拉一次价格快照，再给模型定价",
-				priceBusy: "定价中…", priceNone: "没有需要更新的模型",
-				priceDone: "已更新 {n} 个模型 · {s}",
-				groupAdd: "全加入", groupRemove: "全移除",
-				groupAddHint: "把该品牌的全部模型加入池", groupRemoveHint: "把该品牌的模型全部移出池",
-			},
 			en: {
 				title: "Model router", scope: "Scope", full: "Model+Effort", effort: "Effort", model: "Model",
 				engaged: "Controlling", yielded: "Yielded to your manual pick", resume: "Resume",
@@ -156,13 +91,13 @@ window.__ModuleLoader__.load({
 				groupAddHint: "add every model of this provider to the pool", groupRemoveHint: "remove this provider's models from the pool",
 			},
 		}
-		const dict = () => (typeof navigator !== "undefined" && /^en/i.test(navigator.language || "") ? TEXT.en : TEXT.zh)
+		const dict = () => TEXT.en
 
 		const PACKS = [
-			{ key: "写作", en: "Writing", words: ["续写", "小说", "情节", "文风", "人物", "章节"] },
-			{ key: "代码", en: "Code", words: ["重构", "refactor", "架构", "接口", "测试", "性能"] },
-			{ key: "翻译", en: "Translate", words: ["翻译", "translate", "润色", "校对"] },
-			{ key: "分析", en: "Analysis", words: ["分析", "调研", "对比", "总结", "报告"] },
+			{ key: "Writing", en: "Writing", words: ["continue", "novel", "plot", "style", "character", "chapter"] },
+			{ key: "Code", en: "Code", words: ["refactor", "architecture", "interface", "test", "performance"] },
+			{ key: "Translate", en: "Translate", words: ["translate", "polish", "proofread"] },
+			{ key: "Analysis", en: "Analysis", words: ["analyze", "research", "compare", "summarize", "report"] },
 		]
 		const TIERS = [["cheap", "cheap"], ["strong", "strong"]]
 		const COSTS = [1, 4, 8]
@@ -223,7 +158,7 @@ window.__ModuleLoader__.load({
 			".mr-cross-dot{width:6px;height:6px;border-radius:50%;flex:none;background:currentColor}",
 			".mr-cross-body{color:var(--dsw-alias-label-primary,#e8e8ea);font-size:12px;line-height:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
 			".mr-cross-foot{display:flex;flex-wrap:wrap;align-items:center;gap:6px}",
-			".mr-cross-hint{flex:1;min-width:0;color:var(--dsw-alias-label-caption,#8b9096);font-size:11px;line-height:15px}",
+			".mr-cross-hint{flex:1 0 100%;min-width:0;color:var(--dsw-alias-label-caption,#8b9096);font-size:11px;line-height:15px}",
 			".mr-err{margin:4px 8px;padding:6px 8px;border-radius:var(--dsw-radius-md,8px);background:var(--dsw-alias-interactive-bg-hover-danger,rgba(248,81,73,.14));color:var(--dsw-alias-state-error-primary,#f85149);font-size:11px;line-height:16px;word-break:break-word}",
 			".mr-foot{display:flex;gap:6px;align-items:center;padding:8px 8px 2px;margin-top:2px;border-top:1px solid var(--dsw-alias-border-l1,rgba(127,127,127,.18));color:var(--dsw-alias-label-caption,#8b9096);font-size:11px}",
 			".mr-note{padding:8px;color:var(--dsw-alias-label-caption,#8b9096);font-size:11px}",

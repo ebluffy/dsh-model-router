@@ -219,7 +219,7 @@ const panelOf = (tree) => byClass(tree, 'mr-panel')[0]
 
 test('the bundle registers under the package id and exports a client plugin', () => {
   const { id, exports } = loadBundle()
-  assert.equal(id, '@neptune810/dsh-model-router')
+  assert.equal(id, 'dsh-model-router-en')
   assert.equal(exports.name, 'model-router')
   // The seat drives ui-model-selection's shared ModelDirectory, whose methods resolve
   // `remote.session` against the CALLER's fiber: the plugin root must declare the same
@@ -293,7 +293,16 @@ test('the closed control renders a trigger without touching the network', () => 
   assert.equal(tree.type, 'div')
   const trigger = tree.children[0]
   assert.equal(trigger.type, 'button')
-  assert.match(trigger.props.title || '', /路由|router/i)
+  assert.match(trigger.props.title || '', /router/i)
+})
+
+test('the English fork stays English for non-English browser locales', () => {
+  for (const language of ['zh-CN', 'ru-RU', 'en-US']) {
+    const { exports, react } = loadBundle({ globals: { navigator: { language } } })
+    const element = react.createElement(exports.ModelRouterControl, { sessionId: 's1' })
+    const tree = element.type(element.props)
+    assert.match(byClass(tree, 'mr-trigger')[0].props.title, /Model router/)
+  }
 })
 
 test('the host routes the control talks to are the documented ones', () => {
@@ -372,8 +381,8 @@ test('a call with no recorded effort shows the localized default label', () => {
     node: { data: { callId: 'c1', name: 'read_file' } },
     useProjection: () => ({ calls: { c1: { provider: 'deepseek-official', model: 'deepseek-flash', effort: null } } }),
   })
-  // The sandbox has no navigator, so the bundle falls back to the zh table.
-  assert.equal(row.props.title, 'deepseek-official/deepseek-flash · 默认')
+  // The English fork uses the English table even without navigator.
+  assert.equal(row.props.title, 'deepseek-official/deepseek-flash · default')
 })
 
 test('package.json declares the ui-chat seat and the uiConversation service', () => {
@@ -604,7 +613,7 @@ test('effort rows: provider default omits the key, an explicit level sends it, t
   await app.rt.flush()
   assert.equal(app.dir.calls.select.length, 0)
 
-  // Provider default: the current provider/model, no reasoningEffort key at all.
+  // Default: the current provider/model, no reasoningEffort key at all.
   openPanel(app.holder)
   await app.rt.flush()
   findAll(app.holder.tree, (node) => node.props && node.props['data-official-effort'] === 'provider-default')[0].props.onClick()
@@ -639,7 +648,7 @@ test('a model that advertises no reasoning levels renders no effort section', as
   openPanel(app.holder)
   await app.rt.flush()
   assert.equal(findAll(app.holder.tree, (node) => node.props && node.props['data-official-effort'] !== undefined).length, 0)
-  assert.equal(byClass(app.holder.tree, 'mr-group').map(textOf).includes('推理等级'), false)
+  assert.equal(byClass(app.holder.tree, 'mr-group').map(textOf).includes('Reasoning effort'), false)
   assert.ok(panelOf(app.holder.tree), 'the model list is still there')
 })
 
@@ -672,13 +681,13 @@ test('the official-half trigger labels the session model and its effort through 
     groups: [{ id: 'deepseek-official', models: [{ id: 'deepseek-v4-pro', name: 'V4 Pro', reasoning: { efforts: [{ id: 'low', name: 'Low' }] } }] }],
     current: { provider: 'deepseek-official', model: 'deepseek-v4-pro' },
   }) })
-  assert.deepEqual(labels(triggerOf(providerDefault.holder.tree)), ['V4 Pro', '默认（供应商）'])
+  assert.deepEqual(labels(triggerOf(providerDefault.holder.tree)), ['V4 Pro', 'Default'])
 
   // Loading, then a ready catalog with nothing selected yet.
   const loading = await openControl({ snapshot: officialSnapshot({ status: 'loading', current: null, groups: [] }) })
-  assert.deepEqual(labels(triggerOf(loading.holder.tree)), ['正在加载模型…'])
+  assert.deepEqual(labels(triggerOf(loading.holder.tree)), ['Loading models…'])
   const empty = await openControl({ snapshot: officialSnapshot({ current: null, groups: [] }) })
-  assert.deepEqual(labels(triggerOf(empty.holder.tree)), ['请选择模型'])
+  assert.deepEqual(labels(triggerOf(empty.holder.tree)), ['Select model'])
 
   // A current model outside the catalog is still named exactly.
   const outside = await openControl({ snapshot: officialSnapshot({ current: { provider: 'other-gw', model: 'mystery' }, groups: [] }) })
@@ -744,8 +753,8 @@ test('official catalog errors and provider failures offer a retry that reloads t
   await app.rt.flush()
   assert.match(textOf(byClass(app.holder.tree, 'mr-err')[0]), /boom/)
   const notes = byClass(app.holder.tree, 'mr-note').map(textOf)
-  assert.ok(notes.some((text) => text.includes('DeepSeek 账号') && text.includes('timeout')), 'the failure note names the account')
-  const retries = findAll(app.holder.tree, (node) => node.type === 'button' && textOf(node) === '重新加载')
+  assert.ok(notes.some((text) => text.includes('DeepSeek Account') && text.includes('timeout')), 'the failure note names the account')
+  const retries = findAll(app.holder.tree, (node) => node.type === 'button' && textOf(node) === 'Reload')
   assert.equal(retries.length, 2)
   const before = app.dir.calls.load
   retries[0].props.onClick()
@@ -766,7 +775,7 @@ test('official groups render account, official, then everything else', async () 
   await app.rt.flush()
   const ids = findAll(app.holder.tree, (node) => node.props && node.props['data-official-model']).map((node) => node.props['data-official-model'])
   assert.deepEqual(ids, ['deepseek-account/acct-1', 'deepseek-official/deepseek-flash', 'custom-gw/m1'])
-  assert.deepEqual(byClass(app.holder.tree, 'mr-group').map(textOf).slice(0, 4), ['本会话模型', 'DeepSeek 账号', 'Official', 'Custom'])
+  assert.deepEqual(byClass(app.holder.tree, 'mr-group').map(textOf).slice(0, 4), ['Session model', 'DeepSeek Account', 'Official', 'Custom'])
 })
 
 test('the router half still posts the control, pool and settings payloads it always did', async () => {
@@ -809,8 +818,8 @@ test('effort mode binds exactly one model through /effort-model and never edits 
   const app = await openControl({ state, snapshot: officialSnapshot({ groups: [], current: null }) })
   openPanel(app.holder)
   await app.rt.flush()
-  assert.ok(byClass(app.holder.tree, 'mr-group').map(textOf).includes('思考模式只作用于一个模型'))
-  assert.ok(byClass(app.holder.tree, 'mr-note').map(textOf).some((text) => text.includes('先选一个模型')))
+  assert.ok(byClass(app.holder.tree, 'mr-group').map(textOf).includes('Effort mode works on one model'))
+  assert.ok(byClass(app.holder.tree, 'mr-note').map(textOf).some((text) => text.includes('pick a model first')))
   const chips = findAll(app.holder.tree, (node) => node.type === 'button' && node.props['data-effort-bind'] === 'deepseek-official/deepseek-v4-pro')
   assert.equal(chips.length, 1, 'effort mode offers one bind control on the model row')
   assert.equal(chips[0].props['data-active'], 'false')
@@ -826,7 +835,7 @@ test('effort mode binds exactly one model through /effort-model and never edits 
   await bound.rt.flush()
   const boundChip = findAll(bound.holder.tree, (node) => node.type === 'button' && node.props['data-effort-bind'] === 'deepseek-official/deepseek-v4-pro')[0]
   assert.equal(boundChip.props['data-active'], 'true')
-  assert.equal(textOf(boundChip), '已绑定')
+  assert.equal(textOf(boundChip), 'bound')
   boundChip.props.onClick()
   await bound.rt.flush()
   assert.equal(bound.net.posts('/model-router/effort-model').length, 0, 'a bound control is a no-op')
@@ -849,9 +858,9 @@ test('the seated panel folds the pool into the model rows instead of a second li
   const ticks = findAll(app.holder.tree, (node) => node.type === 'button' && node.props['data-pool-toggle'] === 'deepseek-official/deepseek-v4-pro')
   assert.equal(ticks.length, 1, 'the same row carries the pool tick')
   assert.equal(ticks[0].props['data-active'], 'true')
-  assert.match(textOf(ticks[0]), /模型池/)
+  assert.match(textOf(ticks[0]), /Model pool/)
   // A pooled model also opens its tier/cost/vision line inline.
-  assert.equal(byClass(app.holder.tree, 'mr-line').filter((node) => textOf(node).includes('定位')).length, 1)
+  assert.equal(byClass(app.holder.tree, 'mr-line').filter((node) => textOf(node).includes('Role')).length, 1)
   // The radio still picks the session model: choosing the other model selects it.
   byProp(app.holder.tree, 'data-official-model', 'deepseek-official/deepseek-flash')[0].props.onClick()
   await app.rt.flush()
@@ -868,8 +877,8 @@ function planningState(overrides = {}) {
     effectiveControl: 'effort', engaged: true, effortModelPending: false,
     effectiveEffortModel: 'deepseek-official/deepseek-v4-pro',
     current: null, pool: [], presets: {}, settings: {}, decisions: [],
-    plan: { control: 'effort', effortModel: 'deepseek-official/deepseek-v4-pro', taskType: '小说续写', pool: 2, poolIds: ['a', 'b'] },
-    planKey: 'effort|deepseek-official/deepseek-v4-pro|小说续写|a,b',
+    plan: { control: 'effort', effortModel: 'deepseek-official/deepseek-v4-pro', taskType: 'Novel continuation', pool: 2, poolIds: ['a', 'b'] },
+    planKey: 'effort|deepseek-official/deepseek-v4-pro|Novel continuation|a,b',
     planConfirmed: false, inherited: true,
   }, overrides)
 }
@@ -878,24 +887,24 @@ test('a new conversation highlights the inherited plan and confirms it once', as
   const app = await openControl({ state: planningState() })
   // The trigger announces the pending confirmation before the panel is even opened.
   assert.equal(byClass(app.holder.tree, 'mr-attn').length, 1, 'the trigger carries the attention dot')
-  assert.match(triggerOf(app.holder.tree).props.title, /新对话待确认路由方案/)
+  assert.match(triggerOf(app.holder.tree).props.title, /new conversation needs a routing plan/)
 
   openPanel(app.holder)
   await app.rt.flush()
   const bar = byClass(app.holder.tree, 'mr-confirm')[0]
   assert.ok(bar, 'the unconfirmed plan renders the highlight bar')
   const shown = textOf(bar)
-  assert.match(shown, /已沿用上一次的选择/)
-  assert.match(shown, /思考/, 'the bar states the scope')
+  assert.match(shown, /carried over from your last choice/)
+  assert.match(shown, /Effort/i, 'the bar states the scope')
   assert.match(shown, /deepseek-v4-pro/, 'the bar states the bound effort model')
-  assert.match(shown, /小说续写/, 'the bar states the pinned task type')
-  assert.match(shown, /2 个/, 'the bar states the pool size')
+  assert.match(shown, /Novel continuation/, 'the bar states the pinned task type')
+  assert.match(shown, /pool2/, 'the bar states the pool size')
 
   const button = findAll(bar, (node) => node.type === 'button')[0]
-  assert.equal(textOf(button), '确认')
+  assert.equal(textOf(button), 'Confirm')
   button.props.onClick()
   await app.rt.flush()
-  assert.deepEqual(plain(app.net.posts('/model-router/confirm').pop().body), { sessionId: 'session-1', plan: 'effort|deepseek-official/deepseek-v4-pro|小说续写|a,b' })
+  assert.deepEqual(plain(app.net.posts('/model-router/confirm').pop().body), { sessionId: 'session-1', plan: 'effort|deepseek-official/deepseek-v4-pro|Novel continuation|a,b' })
   assert.equal(byClass(app.holder.tree, 'mr-confirm').length, 0, 'the bar stands down for the rest of the conversation')
   assert.equal(byClass(app.holder.tree, 'mr-attn').length, 0, 'and so does the trigger dot')
 })
@@ -909,14 +918,14 @@ test('a confirmed plan is silent, and a changed plan asks again', async () => {
 
   // Changing the plan changes the key, so the conversation is asked once more.
   const changed = await openControl({ state: planningState({
-    plan: { control: 'effort', effortModel: 'deepseek-official/deepseek-v4-pro', taskType: '代码重构', pool: 2, poolIds: ['a', 'b'] },
-    planKey: 'effort|deepseek-official/deepseek-v4-pro|代码重构|a,b',
+    plan: { control: 'effort', effortModel: 'deepseek-official/deepseek-v4-pro', taskType: 'Code refactoring', pool: 2, poolIds: ['a', 'b'] },
+    planKey: 'effort|deepseek-official/deepseek-v4-pro|Code refactoring|a,b',
   }) })
   openPanel(changed.holder)
   await changed.rt.flush()
   const bar = byClass(changed.holder.tree, 'mr-confirm')[0]
   assert.ok(bar, 'a changed plan is confirmed again')
-  assert.match(textOf(bar), /代码重构/)
+  assert.match(textOf(bar), /Code refactoring/)
   assert.equal(changed.net.posts('/model-router/confirm').length, 0, 'rendering the bar posts nothing by itself')
 })
 
@@ -942,8 +951,8 @@ test('pool rows are grouped by provider and each group adds or removes the whole
   const addVendor = findAll(app.holder.tree, (node) => node.type === 'button' && node.props['data-provider-add'] === 'vendor-x')[0]
   const removeVendor = findAll(app.holder.tree, (node) => node.type === 'button' && node.props['data-provider-remove'] === 'vendor-x')[0]
   assert.ok(addVendor && removeVendor, 'the vendor-x header carries the bulk controls')
-  assert.equal(textOf(addVendor), '全加入')
-  assert.equal(textOf(removeVendor), '全移除')
+  assert.equal(textOf(addVendor), 'Add all')
+  assert.equal(textOf(removeVendor), 'Remove all')
 
   // Add all: only what is missing enters the pool, as a cheap default entry.
   addVendor.props.onClick()
@@ -984,8 +993,8 @@ test('the panel head prices the pool, with the network fetch behind its own butt
   const auto = findAll(app.holder.tree, (node) => node.type === 'button' && node.props['data-mr-auto-price'])[0]
   const net = findAll(app.holder.tree, (node) => node.type === 'button' && node.props['data-mr-net-price'])[0]
   assert.ok(auto && net, 'the head offers both pricing controls')
-  assert.equal(textOf(auto), '自动定价')
-  assert.equal(textOf(net), '联网定价')
+  assert.equal(textOf(auto), 'Auto price')
+  assert.equal(textOf(net), 'Fetch prices')
 
   auto.props.onClick()
   await app.rt.flush()
@@ -999,7 +1008,7 @@ test('the panel head prices the pool, with the network fetch behind its own butt
   // Nothing changed in this stub, so the note says so instead of inventing a count.
   const note = findAll(app.holder.tree, (node) => node.props && node.props['data-mr-price-note'])[0]
   assert.ok(note, 'the outcome is shown under the head')
-  assert.match(textOf(note), /没有需要更新的模型/)
+  assert.match(textOf(note), /nothing to update/)
 })
 
 test('a cross-provider proposal renders the bar and answers through /cross', async () => {
@@ -1016,12 +1025,12 @@ test('a cross-provider proposal renders the bar and answers through /cross', asy
 
   const bar = byClass(app.holder.tree, 'mr-cross')[0]
   assert.ok(bar, 'the proposal renders its own bar')
-  assert.match(textOf(bar), /跨品牌切换/)
+  assert.match(textOf(bar), /Cross-provider switch/)
   assert.match(textOf(bar), /vendor-x\/writer-pro/, 'the bar names the target model')
   const answer = (action) => findAll(app.holder.tree, (node) => node.type === 'button' && node.props['data-mr-cross-action'] === action)[0]
-  assert.equal(textOf(answer('once')), '只切一次')
-  assert.equal(textOf(answer('allow')), '本会话允许')
-  assert.equal(textOf(answer('never')), '不再跨品牌')
+  assert.equal(textOf(answer('once')), 'Switch once')
+  assert.equal(textOf(answer('allow')), 'Allow in this chat')
+  assert.equal(textOf(answer('never')), 'Never cross brands')
 
   answer('once').props.onClick()
   await app.rt.flush()

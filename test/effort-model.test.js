@@ -19,7 +19,7 @@ delete process.env.DSH_PROFILE_DIR
 
 const ROUTES = { trivial: { effort: 'low' }, standard: { effort: 'low' }, engineering: { effort: 'high' }, hard: { effort: 'high' } }
 /** A dense engineering brief classifies as "hard", which asks for "high" effort. */
-const HARD_BRIEF = '重构 架构 设计 规划 迁移 优化 性能 并发 并行 调试 诊断'
+const HARD_BRIEF = 'refactor architecture design planning migration optimization performance concurrency parallel debugging diagnosis'
 const POOL = [
   { id: 'deepseek-official/deepseek-flash', cost: 1, tier: 'cheap' },
   { id: 'deepseek-official/deepseek-v4-pro', cost: 8, tier: 'strong' },

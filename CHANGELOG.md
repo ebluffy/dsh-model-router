@@ -1,5 +1,13 @@
 # Changelog
 
+## English Fork
+
+- Package identity: `dsh-model-router-en`, based on upstream version 0.14.2.
+- Translated documentation, preview images, task presets, and test fixtures into English.
+- The panel always uses English, regardless of the browser locale.
+- Preserved multilingual request recognition and routing behavior.
+- Wrapped the cross-provider hint above its action buttons to accommodate English labels.
+
 ## 0.14.2
 
 **The composer readout now tracks the host almost live: a shorter poll plus an immediate refresh the moment the window comes back.**
@@ -31,20 +39,17 @@
 
 **Crossing brands is now its own decision: the model pool is grouped per provider with bulk add/remove, costs can be filled in automatically, and a switch to a different provider asks first.**
 
-- 模型池 / Model pool rows are grouped by provider — both under the official directory groups and under 其他模型 /
-  Other models — and every group header carries 全加入 / Add all and 全移除 / Remove all, so building a
+- Model pool rows are grouped by provider — both under the official directory groups and under Other models — and every group header carries Add all and Remove all, so building a
   second-brand pool is two clicks instead of one click per model.
-- New `lib/pricing.js` (pure, import-free): a built-in relative-price classifier for the 便宜 / 中 / 贵 levels
+- New `lib/pricing.js` (pure, import-free): a built-in relative-price classifier for the Cheap / Medium / Expensive levels
   (1 / 4 / 8) covering the common DeepSeek, OpenAI, Anthropic, Google, Qwen and Llama families, plus
   `POST /model-router/pool/auto-price { fetch }` and `POST /model-router/prices`. Every pool entry records
   where its cost came from (`costSource`: `builtin` | `openrouter` | `manual`); a level you labelled by hand
-  is never overwritten. 自动定价 / Auto price uses the built-in table and any stored snapshot; 联网定价 /
-  Fetch prices pulls a fresh OpenRouter snapshot first (20 s timeout) and stores it in
+  is never overwritten. Auto price uses the built-in table and any stored snapshot; Fetch prices pulls a fresh OpenRouter snapshot first (20 s timeout) and stores it in
   `<profile>/.model-router/state.json` under `prices`.
-- Cross-provider guard: a switch away from the provider currently in use is gated by 跨品牌 / Cross-brand
-  (允许 / 先问 / 禁止 — allow / ask / off, default ask). Under `ask` the host stays on the current brand and
-  exposes `state.cross.proposal`, and the panel shows a propose bar with 只切一次 / Switch once, 本会话允许 /
-  Allow in this chat and 不再跨品牌 / Never cross brands. A pool that holds only another brand keeps routing
+- Cross-provider guard: a switch away from the provider currently in use is gated by Cross-brand
+  (allow / ask / off, default ask). Under `ask` the host stays on the current brand and
+  exposes `state.cross.proposal`, and the panel shows a propose bar with Switch once, Allow in this chat and Never cross brands. A pool that holds only another brand keeps routing
   (the guard only fires when a same-brand alternative exists), and the hysteresis memory can no longer
   resurrect a model the guard excluded.
 - `POST /model-router/cross { sessionId, action }`; `/state` gains `cross` (mode, anchor, proposal) and
@@ -60,10 +65,9 @@
   `last` in `<profile>/.model-router/state.json`. A conversation with no choice of its own inherits it; a
   conversation you have already configured keeps its own `sessions` entry, and the two never affect each
   other.
-- A conversation that inherited a plan opens with a warn-tinted bar at the top: 已沿用上一次的选择 /
-  carried over from your last choice, or 新对话：先确认这次的路由方案 / new conversation — confirm this
-  routing plan when there was nothing to inherit yet. It lists the effective 范围 / 思考模型 / 任务类型 /
-  模型池 and a 确认 / Confirm button that posts `POST /model-router/confirm { sessionId, plan }`.
+- A conversation that inherited a plan opens with a warn-tinted bar at the top: carried over from your last choice, or new conversation — confirm this
+  routing plan when there was nothing to inherit yet. It lists the effective Scope / Effort model / Task type /
+  Model pool and a Confirm button that posts `POST /model-router/confirm { sessionId, plan }`.
 - Until it is confirmed the composer trigger carries a pulsing amber dot. Confirming records the plan key for
   that session — `/state` reports it as `plan`, `planKey` and `planConfirmed` — so the bar, the dot and
   the trigger tooltip stand down. Changing the scope, the bound model, the task type or the pool produces a
@@ -76,13 +80,13 @@
 
 **The model pool is no longer a second list: it lives on the model rows themselves, so the panel is one list instead of two near-identical ones.**
 
-- Every row in the session-model list now carries a 模型池 / Model pool chip on its right. Tapping it pools
-  or unpools that model; a pooled row expands its 定位 / 价格 / 视觉 controls directly underneath, and pool
-  entries that have no provider group in the directory render under 其他模型 / Other models together with
-  the manual "type a model id" row, so a stale entry can always still be unticked. The standalone 模型池
+- Every row in the session-model list now carries a Model pool chip on its right. Tapping it pools
+  or unpools that model; a pooled row expands its Role / Price / Vision controls directly underneath, and pool
+  entries that have no provider group in the directory render under Other models together with
+  the manual "type a model id" row, so a stale entry can always still be unticked. The standalone Model pool
   section, its heading and its note are gone.
-- In 思考 / effort scope the same chip becomes 接管 / 已绑定 and binds the one model that scope needs; the
-  先选一个模型 hint stays at the top of the list.
+- In effort scope the same chip becomes Control / Bound and binds the one model that scope needs; the
+  Select a model first hint stays at the top of the list.
 - The panel header keeps a pool chip only when the router falls back to the `.right` capsule (a host
   without the seat); with the seat there is no second pool control.
 - `docs/ui-preview.html` renders the folded list.
@@ -92,9 +96,9 @@
 
 **The model pool now lives behind a control on the router row, so the panel opens short and the list appears only when you ask for it.**
 
-- The panel header carries a 模型池 / Model pool chip at the right of the router row, with the count of
-  selectable models. It opens and closes the pool list in place; the list starts collapsed, so 控制范围
-  and 任务类型 lead straight to 任务预设 instead of every model with its tier / cost / vision rows.
+- The panel header carries a Model pool chip at the right of the router row, with the count of
+  selectable models. It opens and closes the pool list in place; the list starts collapsed, so Routing scope
+  and Task type lead straight to Task presets instead of every model with its tier / cost / vision rows.
 - Effort scope still forces the list open while no model is bound, because the one-model pick comes
   first; once the binding clears `effortModelPending`, the list collapses on its own again.
 - The header's status text now truncates with an ellipsis instead of pushing the pool chip and the
@@ -110,12 +114,11 @@
   `@deepseek-ai/dsh-client-ui-model-selection`). The slots engine renders the lowest priority, so the
   router's control takes over that cell and the composer shows a single control instead of a second
   chip beside the official picker.
-- That one control keeps both halves. The official half is 本会话模型 / Session model and 推理等级 /
-  Reasoning effort, driven by the real ModelDirectory through `props.directory.store` subscribe,
+- That one control keeps both halves. The official half is Session model and Reasoning effort, driven by the real ModelDirectory through `props.directory.store` subscribe,
   `props.load()` and `props.select({ provider, model, reasoningEffort })`: provider/model groups, the
   current-row check, the pending spinner, the provider-default row, catalog loading / error / retry and
-  the official "model · effort" trigger label. Below it sit the router's own groups: 接管 status,
-  控制范围 (模型+思考 / 思考 / 模型), 任务类型, 模型池, 任务预设 and 更多.
+  the official "model · effort" trigger label. Below it sit the router's own groups: Control status,
+  Routing scope (Model+Effort / Effort / Model), Task type, Model pool, Task presets and More.
 - The old `conversation.input.right` chip (`model-router:composer-control`, order 20) is still
   registered, but it **self-retracts** — it disposes itself as soon as the seat registration lands — so
   a normal host renders an empty `.right` column and only ever sees the merged cell. A host that
@@ -130,7 +133,7 @@
   `@deepseek-ai/dsh-api-session-controller` alongside the UI packages.
 - Browser-verified on a real `dsh web` server with the plugin installed: no boot card, no console
   errors, exactly one control in the cell, its label shows the official "DeepSeek-V41-Flash / High", the
-  panel shows 本会话模型 + 推理等级 above the router groups, the old `.right` column is empty, and
+  panel shows Session model + Reasoning effort above the router groups, the old `.right` column is empty, and
   clicking an official effort row really changes the official selection.
 - 130 tests (2 new in `test/client.test.js`).
 
@@ -196,8 +199,8 @@ score.**
   at most 60 tokens, and `standard` required zero tool calls. With `allowMax: false` (the default)
   `clampEffort` demotes `max` to `high`, so `hard` and `engineering` applied the same effort and
   evidence escalation (errors/repeats) changed nothing for a task already at engineering.
-- Measured before: `帮我把这个文件里的日志改成中文` → tools=0 `standard`/`low`, then
-  tools=1/3/6/12/25 `engineering`/`high` for the rest of the task; `翻译一下这句话` with a single
+- Measured before: `Help me translate the logs in this file into Chinese` → tools=0 `standard`/`low`, then
+  tools=1/3/6/12/25 `engineering`/`high` for the rest of the task; `Translate this sentence` with a single
   tool also went to `high`.
 - New `scoring.toolCallClass`, default **`standard`**: tool activity still adds score
   (`toolCallBase` / `toolCallAt` / `toolCallBig`) but no longer decides the class — the brief (strong
@@ -215,7 +218,7 @@ score.**
 
 - Each tool call in the conversation gains one compact line — `deepseek-official/deepseek-v4-pro · high`
   — naming the model and the thinking level that actually ran that segment; when the adapter owns the
-  default, the effort shows the localized **默认** / **default** label.
+  default, the effort shows the **default** label.
 - The host folds the session's own events into the new `modelRouterRoute` session projection
   (`stateVersion` 1): `request/header` → provider/model/effort, `step/start` → turn/step, `tool/call`
   → the pair for that call id. It keeps the last **200** calls per session and drops the oldest.
@@ -230,20 +233,20 @@ score.**
 
 ## 0.7.0
 
-**The scope decides which manual pick counts, and 思考 is bound to one model you choose.**
+**The scope decides which manual pick counts, and Effort is bound to one model you choose.**
 
-- `全授权` is now **模型+思考** (English: **Model+Effort**), because it read like the workspace's own
+- `Full authorization` is now **Model+Effort**, because it read like the workspace's own
   permission level and said nothing about the thinking level; the scope hint now spells out what each
   mode may change.
-- **思考 works on exactly one model.** The panel asks you to pick a single model first
+- **Effort works on exactly one model.** The panel asks you to pick a single model first
   (`POST /model-router/effort-model`), and until you do the router stays out entirely — it changes
   neither the model nor the effort. Once one is bound, the router only touches a step whose resolved
   model is that one, and takes the effort vocabulary from that model instead of an unrelated pool
   entry.
-- **A manual pick only counts in the scope that owns it.** In 思考, switching the model by hand is no
+- **A manual pick only counts in the scope that owns it.** In Effort, switching the model by hand is no
   longer a manual override — the router keeps adjusting its bound model's thinking level — while
-  changing the effort by hand still stands it down. 模型 is the mirror image: an effort-only change
-  leaves it engaged, a model switch stands it down. 模型+思考 reacts to either.
+  changing the effort by hand still stands it down. Model is the mirror image: an effort-only change
+  leaves it engaged, a model switch stands it down. Model+Effort reacts to either.
 - `/state` gains `effortModel`, `effectiveEffortModel` and `effortModelPending`, so the panel can
   show the bound model and prompt while none is picked.
 - 91 tests (10 new in `test/effort-model.test.js`).
@@ -282,11 +285,11 @@ score.**
 
 **The routed model and its effort are visible again, for every step.**
 
-- The composer chip now carries the live choice next to the scope — `全授权 · v4-pro · high` —
+- The composer chip now carries the live choice next to the scope — `Full authorization · v4-pro · high` —
   and refreshes every 2.5s while a task runs (hidden tabs skip the poll), so each round's
   model and reasoning effort are visible without opening the panel. The tooltip has the full
   `provider/model`, the effort and the step class.
-- The panel gained **最近决策**: the last five routed steps as
+- The panel gained **Recent decisions**: the last five routed steps as
   `T<turn>.<step> · model · effort · class`, so the per-step story is readable after the fact.
 - 80 tests; `docs/ui-preview.html` and the captures were refreshed.
 
@@ -295,7 +298,7 @@ score.**
 **Two bugs the composer UI showed: a dead scope control in a new conversation, and an
 amber dot without a manual pick.**
 
-- **控制范围 in a brand-new conversation.** The panel refused to load without a session id,
+- **Routing scope in a brand-new conversation.** The panel refused to load without a session id,
   and `/state` ignored a per-session pick that was saved before the session's first
   request — so the segmented control snapped back and looked dead. The host now answers
   session-less reads with the deployment default, stores a pick made before the session
@@ -339,7 +342,7 @@ amber dot without a manual pick.**
   showed through the panel and the text was hard to read. The panel now measures that
   colour plus \`--dsw-alias-bg-base\`, composes them, and paints an **opaque** surface by
   default instead of the raw menu token.
-- **更多 → 面板背景** switches between 不透明 and 跟随主题 (the translucent menu colour with a
+- **More → Panel background** switches between Opaque and Follow theme (the translucent menu colour with a
   22px backdrop blur). It persists like the other settings (\`panelBg\`).
 - The sticky header inherits the panel surface rather than re-painting a translucent one,
   so scrolled content no longer shows through the title bar.
@@ -350,10 +353,10 @@ amber dot without a manual pick.**
 
 **Plain wording, hover explanations, and the preview ships with the package.**
 
-- 档位/成本 became **定位（日常 / 攻坚）** and **价格（便宜 / 中 / 贵）** — the same
+- Tier/cost became **Role (Routine / Hard)** and **Price (Cheap / Medium / Expensive)** — the same
   \`tier\`/\`cost\` fields, only the labels changed, so existing configs keep working.
-- Every control now explains itself on hover: 定位, 价格, 视觉, 控制范围, 任务类型,
-  带图步骤, 任务识别, 上下文压力, plus a one-line hint under 模型池.
+- Every control now explains itself on hover: Role, Price, Vision, Routing scope, Task type,
+  Image steps, Task detection, Context pressure, plus a one-line hint under Model pool.
 - Fixed a layout bug the new labels exposed: shrinkable captions and chips wrapped into
   vertical text. Captions/chips/segments no longer shrink and a crowded line wraps as a
   whole; the panel widened to 372px.
@@ -404,9 +407,8 @@ amber dot without a manual pick.**
 - The composer panel is now a real editor. **Model pool**: tick models from the live
   catalog (the same list the host's model selector shows) and set each one's
   tier / cost / vision with dropdowns, instead of typing `provider/model` ids.
-- **Task presets are built with buttons**: click a keyword pack (写作 / 代码 / 翻译 /
-  分析) or type a word and press enter, then choose each pooled model's weight from a
-  dropdown (不参与 / 低 / 中 / 高). The JSON textarea is gone.
+- **Task presets are built with buttons**: click a keyword pack (Writing / Code / Translation / Analysis) or type a word and press enter, then choose each pooled model's weight from a
+  dropdown (Exclude / Low / Medium / High). The JSON textarea is gone.
 - **More settings** in the same panel: image steps (leave alone / vision model), task
   detection (keyword rules / semantic), context pressure (off / prefer cheap when
   nearly full) — all selects, persisted through `POST /model-router/settings`.

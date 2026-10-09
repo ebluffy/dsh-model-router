@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="zh" data-theme="dark">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
-<title>dsh-model-router · 面板预览</title>
+<title>dsh-model-router-en · Panel preview</title>
 <style>
 :root[data-theme="dark"]{
   --dsw-radius-sm:6px;--dsw-radius-md:8px;--dsw-radius-lg:12px;
@@ -81,7 +81,7 @@ body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:ce
 .mr-cross-dot{width:6px;height:6px;border-radius:50%;flex:none;background:currentColor}
 .mr-cross-body{color:var(--dsw-alias-label-primary,#e8e8ea);font-size:12px;line-height:17px}
 .mr-cross-foot{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
-.mr-cross-hint{flex:1;min-width:0;color:var(--dsw-alias-label-caption,#8b9096);font-size:11px;line-height:15px}
+.mr-cross-hint{flex:1 0 100%;min-width:0;color:var(--dsw-alias-label-caption,#8b9096);font-size:11px;line-height:15px}
 .mr-confirm{display:flex;flex-direction:column;gap:5px;margin:2px 6px 6px;padding:8px 10px;border:1px solid var(--dsw-alias-state-warn-label,rgba(210,153,34,.45));border-radius:var(--dsw-radius-md,8px);background:var(--dsw-alias-interactive-bg-hover-warn,rgba(210,153,34,.12))}
 .mr-confirm-head{display:flex;align-items:center;gap:6px;color:var(--dsw-alias-state-warn-label,#d29922);font-size:11px;font-weight:500}
 .mr-confirm-dot{width:6px;height:6px;border-radius:50%;flex:none;background:currentColor}
@@ -100,111 +100,111 @@ body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:ce
 <body>
 <div class="main">
 <div class="wrap">
-  <button class="mr-trigger" type="button" title="输入栏模型格的静态样子：显示本会话模型，副标签是它的推理等级">deepseek-v4-pro <span class="mr-sub" title="本会话模型 deepseek-official/deepseek-v4-pro 的推理等级">high</span> <span class="mr-dot" data-yielded="false"></span></button>
-  <button class="mr-trigger" type="button" title="新对话还没确认路由方案时：触发器上多一个脉冲黄点（确认后消失）">deepseek-v4-pro <span class="mr-sub" title="本会话模型 deepseek-official/deepseek-v4-pro 的推理等级">high</span> <span class="mr-attn" title="新对话待确认路由方案"></span> <span class="mr-dot" data-yielded="false"></span></button>
-  <button class="mr-trigger" type="button" disabled title="会话被占用 / 已失效时：按钮仍然在，但是禁用的（不会弹面板）">deepseek-v4-pro <span class="mr-sub">high</span> <span class="mr-spin" title="正在切换模型（pending）"></span> <span class="mr-dot" data-yielded="false"></span></button>
-  <button class="toggle" type="button" onclick="var r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark'">切换深/浅色</button>
-  <p class="caption">dsh-model-router 已并入官方输入栏的「模型」格（就是原来选模型/思考等级的那个位置）：点开是同一个弹窗，上半部分是官方的本会话模型 + 推理等级，下半部分是插件自己的路由设置。渲染的就是插件里那份 CSS，只把主题变量换成了近似值；鼠标停在任意控件上会显示解释。<br>模型池不再单独列一段：每一行模型的右半边就是那个「模型池」小胶囊，点一下加进/移出，进了池子的模型才会在它下面展开定位 / 价格 / 视觉那一行；新对话继承上一次的方案，并在顶部高亮条里确认一次；模型行按 provider 分组，每组右侧可以一次把整个品牌加入 / 移出池子，面板头部能用内置规则或 OpenRouter 快照自动填价格；跨品牌切换默认先问，顶部弹出提议条——一份列表同时干两件事，菜单因此短了一半。<br>官方那格没被声明时（老版本 / 别的宿主），插件会退回输入栏右侧的小胶囊，这时模型池才会单独成段。</p>
+  <button class="mr-trigger" type="button" title="Static composer model control: shows the session model and its reasoning effort">deepseek-v4-pro <span class="mr-sub" title="Reasoning effort for session model deepseek-official/deepseek-v4-pro">high</span> <span class="mr-dot" data-yielded="false"></span></button>
+  <button class="mr-trigger" type="button" title="An unconfirmed routing plan adds a pulsing yellow dot to the trigger; confirmation removes it">deepseek-v4-pro <span class="mr-sub" title="Reasoning effort for session model deepseek-official/deepseek-v4-pro">high</span> <span class="mr-attn" title="New conversation: routing plan awaiting confirmation"></span> <span class="mr-dot" data-yielded="false"></span></button>
+  <button class="mr-trigger" type="button" disabled title="When the session is busy or unavailable, the button remains visible but disabled and does not open the panel">deepseek-v4-pro <span class="mr-sub">high</span> <span class="mr-spin" title="Switching model (pending)"></span> <span class="mr-dot" data-yielded="false"></span></button>
+  <button class="toggle" type="button" onclick="var r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark'">Toggle dark/light</button>
+  <p class="caption">dsh-model-router-en shares the official composer Model control, where model and reasoning effort were already selected. The same popup has official session model and reasoning effort controls above the plugin's routing settings. This preview uses the plugin's CSS with approximate theme variables; hover over controls for details.<br>The pool no longer has a separate list: the Model pool chip on each model row adds or removes that model. Pooled models expand Role / Price / Vision controls below. New conversations inherit the previous plan and ask for confirmation in the highlighted bar. Models are grouped by provider, with group-wide add/remove controls. The header fills prices using built-in rules or an OpenRouter snapshot. Cross-brand switching asks first by default, showing a proposal at the top. One list serves both purposes, shortening the menu.<br>When the official control is unavailable on an older or different host, the plugin falls back to a chip on the composer's right side and displays the pool separately.</p>
 </div>
 <div class="mr-panel">
-  <div class="mr-head"><span class="mr-name">模型路由</span><span class="mr-dot" data-yielded="false" title="绿点 = 正在自动接管：按需要换模型、调思考等级"></span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="绿点 = 正在自动接管">已接管</span><button class="mr-chip" style="margin-left:auto" title="用内置规则给没手标的模型填「便宜/中/贵」">自动定价</button><button class="mr-chip" title="先从 OpenRouter 拉一次价格快照，再给模型定价">联网定价</button><button class="mr-btn mr-icon-btn" style="margin-left:auto"><svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l8 8M11 3l-8 8"/></svg></button></div>
-  <!-- 每个新对话先确认一次：继承上一次的方案，确认后本对话不再出现这条 -->
+  <div class="mr-head"><span class="mr-name">Model router</span><span class="mr-dot" data-yielded="false" title="Green dot = routing active: changes models and reasoning effort as needed"></span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="Green dot = routing active">Active</span><button class="mr-chip" style="margin-left:auto" title="Use built-in rules to assign Cheap/Medium/Expensive to models without manual prices">Auto price</button><button class="mr-chip" title="Fetch an OpenRouter price snapshot, then price models">Fetch prices</button><button class="mr-btn mr-icon-btn" style="margin-left:auto"><svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l8 8M11 3l-8 8"/></svg></button></div>
+  <!-- Confirm once per new conversation: inherit the previous plan, then hide this bar after confirmation -->
   <div class="mr-confirm" data-mr-confirm="true">
-    <div class="mr-confirm-head"><span class="mr-confirm-dot"></span><span title="这条方案是从上一个对话继承来的">已沿用上一次的选择</span></div>
+    <div class="mr-confirm-head"><span class="mr-confirm-dot"></span><span title="This plan was inherited from the previous conversation">Carried over from your last choice</span></div>
     <div class="mr-confirm-plan">
-      <span class="mr-tag">范围</span><span class="mr-confirm-val">思考</span>
-      <span class="mr-tag">思考模型</span><span class="mr-confirm-val">deepseek-v4-pro</span>
-      <span class="mr-tag">任务类型</span><span class="mr-confirm-val">小说续写</span>
-      <span class="mr-tag">模型池</span><span class="mr-confirm-val">2 个</span>
+      <span class="mr-tag">Scope</span><span class="mr-confirm-val">Effort</span>
+      <span class="mr-tag">Effort model</span><span class="mr-confirm-val">deepseek-v4-pro</span>
+      <span class="mr-tag">Task type</span><span class="mr-confirm-val">Story continuation</span>
+      <span class="mr-tag">Model pool</span><span class="mr-confirm-val">2 models</span>
     </div>
     <div class="mr-confirm-foot">
-      <span class="mr-confirm-hint" title="确认后本对话不再提示；改范围 / 模型 / 任务类型 / 模型池会重新提示">确认后本对话不再提示</span>
-      <button class="mr-btn" data-primary="true" type="button" title="POST /model-router/confirm { sessionId, plan }">确认</button>
+      <span class="mr-confirm-hint" title="Hidden after confirmation; changing scope, model, task type or pool prompts again">Hidden after confirmation in this chat</span>
+      <button class="mr-btn" data-primary="true" type="button" title="POST /model-router/confirm { sessionId, plan }">Confirm</button>
     </div>
   </div>
-  <!-- 跨品牌提议：宿主下一步想换到另一个品牌时才会出现（默认「先问」） -->
+  <!-- Cross-brand proposal: shown only when the host wants another brand next (default: Ask) -->
   <div class="mr-cross" data-mr-cross="proposal">
-    <div class="mr-cross-head"><span class="mr-cross-dot"></span><span>跨品牌切换</span></div>
-    <div class="mr-cross-body" title="vendor-x/writer-pro">这一步想换到另一个品牌 · vendor-x/writer-pro</div>
+    <div class="mr-cross-head"><span class="mr-cross-dot"></span><span>Cross-brand switch</span></div>
+    <div class="mr-cross-body" title="vendor-x/writer-pro">This step proposes switching to another brand · vendor-x/writer-pro</div>
     <div class="mr-cross-foot">
-      <span class="mr-cross-hint" title="POST /model-router/cross { sessionId, action }">只影响这一步；不选就继续用当前品牌</span>
-      <button class="mr-btn" type="button" title="只让这一步跨过去">只切一次</button>
-      <button class="mr-btn" type="button" title="本对话内不再询问">本会话允许</button>
-      <button class="mr-btn" type="button" title="写进设置：以后不再跨品牌">不再跨品牌</button>
+      <span class="mr-cross-hint" title="POST /model-router/cross { sessionId, action }">Applies to this step only; no choice keeps the current brand</span>
+      <button class="mr-btn" type="button" title="Allow the switch for this step only">Switch once</button>
+      <button class="mr-btn" type="button" title="Do not ask again in this conversation">Allow in chat</button>
+      <button class="mr-btn" type="button" title="Save the setting: never switch brands again">Never cross brands</button>
     </div>
   </div>
-  <!-- 上半部分 = 官方那半：本会话模型 + 推理等级（渲染顺序与 client.js 一致） -->
-  <div class="mr-group" title="官方那半：这里改的是本会话真正用的模型和推理等级，和插件接管无关">本会话模型</div>
-  <div class="mr-prov" title="按 provider 分组：每组标题右侧可以一次把整个品牌的模型加入 / 移出模型池">
-    <div class="mr-group">DeepSeek 账号</div>
-    <button class="mr-chip" title="把该品牌的全部模型加入池">全加入</button>
-    <button class="mr-chip" title="把该品牌的模型全部移出池">全移除</button>
+  <!-- Upper section = official session model and reasoning effort (same render order as client.js) -->
+  <div class="mr-group" title="Official controls: change the actual session model and effort independently of plugin routing">Session model</div>
+  <div class="mr-prov" title="Grouped by provider: header controls add or remove all models for the brand">
+    <div class="mr-group">DeepSeek account</div>
+    <button class="mr-chip" title="Add all models for this brand to the pool">Add all</button>
+    <button class="mr-chip" title="Remove all models for this brand from the pool">Remove all</button>
   </div>
-  <div class="mr-row" title="左边是官方模型行，右边那个「模型池」胶囊才是插件的：勾上 = 允许路由到这个模型"><button class="mr-pick" type="button" role="menuitemradio" aria-checked="true" title="官方模型行：点了就把本会话切成这个模型，不会顺带动思考等级"><span class="mr-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.5l3 3L11.5 4"/></svg></span><span class="mr-name">DeepSeek V4 Pro</span></button><button class="mr-chip" data-active="true" title="已在模型池里：再点一次把它移出去">模型池</button></div>
-  <div class="mr-line" style="padding:0 8px 4px 34px"><span class="mr-tag" title="日常 = 平时就用它；攻坚 = 只在硬活/工程活时优先（hard +15 分、工程 +8 分）">定位</span><div class="mr-seg" title="日常 = 平时就用它；攻坚 = 只在硬活/工程活时优先（hard +15 分、工程 +8 分）"><button title="日常：平时优先用它，省钱">日常</button><button data-active="true" title="攻坚：任务变难、或工具报错等证据出现时才优先">攻坚</button></div><span class="mr-tag" title="相对价格，随你标">价格</span><div class="mr-seg" title="相对价格，随你标：越贵越要任务够硬才选得中（1/4/8 分别扣 0.4 / 1.6 / 3.2 分）"><button title="成本 1，扣 0.4 分">便宜</button><button title="成本 4，扣 1.6 分">中</button><button data-active="true" title="成本 8，扣 3.2 分">贵</button></div><button class="mr-chip" title="带图任务优先选它（+25 分）">视觉</button></div>
-  <div class="mr-row" title="这个模型不在模型池里，所以下面没有定位/价格那一行"><button class="mr-pick" type="button" role="menuitemradio" aria-checked="false" title="点别的模型 = 只换本会话模型；点已经选中的这一行 = 什么都不发，直接关掉弹窗"><span class="mr-check"></span><span class="mr-name">DeepSeek V4 Flash</span></button><button class="mr-chip" title="点一下把它加进模型池">模型池</button></div>
+  <div class="mr-row" title="Official model selection is on the left; the plugin's pool chip on the right enables routing to this model"><button class="mr-pick" type="button" role="menuitemradio" aria-checked="true" title="Official model row: switches the session model without changing reasoning effort"><span class="mr-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.5l3 3L11.5 4"/></svg></span><span class="mr-name">DeepSeek V4 Pro</span></button><button class="mr-chip" data-active="true" title="Already pooled: click again to remove">Model pool</button></div>
+  <div class="mr-line" style="padding:0 8px 4px 34px"><span class="mr-tag" title="Routine = everyday use; Hard = prefer difficult or engineering tasks (hard +15, engineering +8 points)">Role</span><div class="mr-seg" title="Routine = everyday use; Hard = prefer difficult or engineering tasks (hard +15, engineering +8 points)"><button title="Routine: prefer for everyday tasks to save money">Routine</button><button data-active="true" title="Hard: prefer when tasks become difficult or tools report errors">Hard</button></div><span class="mr-tag" title="Relative price, set manually">Price</span><div class="mr-seg" title="Relative price, set manually: expensive models require harder tasks (1/4/8 deduct 0.4 / 1.6 / 3.2 points)"><button title="Cost 1, deduct 0.4 points">Cheap</button><button title="Cost 4, deduct 1.6 points">Medium</button><button data-active="true" title="Cost 8, deduct 3.2 points">Expensive</button></div><button class="mr-chip" title="Prefer for image tasks (+25 points)">Vision</button></div>
+  <div class="mr-row" title="Not pooled, so no role/price controls appear below"><button class="mr-pick" type="button" role="menuitemradio" aria-checked="false" title="Another model changes only the session model; selecting the current row sends nothing and closes the popup"><span class="mr-check"></span><span class="mr-name">DeepSeek V4 Flash</span></button><button class="mr-chip" title="Click to add to the pool">Model pool</button></div>
   <div class="mr-prov">
-    <div class="mr-group">DeepSeek 官方</div>
-    <button class="mr-chip" title="把该品牌的全部模型加入池">全加入</button>
-    <button class="mr-chip" title="把该品牌的模型全部移出池">全移除</button>
+    <div class="mr-group">DeepSeek official</div>
+    <button class="mr-chip" title="Add all models for this brand to the pool">Add all</button>
+    <button class="mr-chip" title="Remove all models for this brand from the pool">Remove all</button>
   </div>
-  <div class="mr-row"><button class="mr-pick" type="button" role="menuitemradio" aria-checked="false" title="正在切换（pending）：对勾的位置显示转圈，按钮同时禁用"><span class="mr-check"><span class="mr-spin"></span></span><span class="mr-name">DeepSeek V4</span></button><button class="mr-chip" title="点一下把它加进模型池">模型池</button></div>
-  <div class="mr-group" title="只对当前这个模型有效；当前模型没有任何等级可选时，这一整段不出现">推理等级</div>
-  <button class="mr-row" type="button" role="menuitemradio" aria-checked="false" title="不给服务端发思考等级 = 交回供应商默认；只有模型自己没写默认等级时才有这一行"><span class="mr-check"></span><span class="mr-name">默认（供应商）</span></button>
-  <button class="mr-row" type="button" role="menuitemradio" aria-checked="true" title="发送 reasoningEffort=high；点已选中的那行同样是什么都不发"><span class="mr-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.5l3 3L11.5 4"/></svg></span><span class="mr-name">high</span></button>
+  <div class="mr-row"><button class="mr-pick" type="button" role="menuitemradio" aria-checked="false" title="Switching (pending): a spinner replaces the checkmark and disables the button"><span class="mr-check"><span class="mr-spin"></span></span><span class="mr-name">DeepSeek V4</span></button><button class="mr-chip" title="Click to add to the pool">Model pool</button></div>
+  <div class="mr-group" title="Applies only to the current model; hidden if it offers no selectable effort levels">Reasoning effort</div>
+  <button class="mr-row" type="button" role="menuitemradio" aria-checked="false" title="Omit effort to use the provider default; shown only when the model declares no default"><span class="mr-check"></span><span class="mr-name">Default (provider)</span></button>
+  <button class="mr-row" type="button" role="menuitemradio" aria-checked="true" title="Sends reasoningEffort=high; selecting the current row sends nothing"><span class="mr-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.5l3 3L11.5 4"/></svg></span><span class="mr-name">high</span></button>
   <div class="mr-div"></div>
-  <!-- 下半部分 = 插件自己的路由设置（控制范围 / 模型池 / 预设 / 更多 / 最近决策） -->
-  <div class="mr-line" style="padding:0 8px 6px"><span style="flex:1" title="插件能改什么">控制范围</span><div class="mr-seg" title="插件能改什么：模型+思考 = 模型 + 思考等级；思考 = 只调选中的那一个模型的思考等级；模型 = 只调模型"><button data-active="true" title="模型和思考等级都交给插件">模型+思考</button><button title="只调你在下面选中的那一个模型的思考等级；没选之前不接管">思考</button><button title="只让插件换模型，思考等级不动">模型</button></div></div>
-  <button class="mr-row" title="自动 = 按关键词规则判断；也可以强制指定一个类型"><span class="mr-name">任务类型</span><span class="mr-sub">自动（按关键词规则）</span><span class="mr-check"><svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 2.5l5 4.5-5 4.5"/></svg></span></button>
-  <!-- 模型池不再单独列出：勾选就长在上面那些模型行的右半边（渲染顺序与 client.js 一致） -->
+  <!-- Lower section = plugin routing settings (scope / pool / presets / more / recent decisions) -->
+  <div class="mr-line" style="padding:0 8px 6px"><span style="flex:1" title="What the plugin can change">Routing scope</span><div class="mr-seg" title="Model+Effort changes both; Effort adjusts the selected model's effort; Model changes only the model"><button data-active="true" title="Let the plugin control model and effort">Model+Effort</button><button title="Adjust effort only for the selected model; routing waits for a selection">Effort</button><button title="Change models only, leaving effort unchanged">Model</button></div></div>
+  <button class="mr-row" title="Auto uses keyword rules; a task type can also be forced"><span class="mr-name">Task type</span><span class="mr-sub">Auto (keyword rules)</span><span class="mr-check"><svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 2.5l5 4.5-5 4.5"/></svg></span></button>
+  <!-- Pool selection lives on the right of the model rows, not in a separate list (same render order as client.js) -->
   <div class="mr-div"></div>
-  <div class="mr-group">任务预设</div>
-  <div class="mr-row" data-static="true"><span class="mr-check"></span><button class="mr-btn" style="padding:0;flex:1;justify-content:flex-start;gap:8px"><span class="mr-name">小说续写</span><span class="mr-sub" style="flex:0 1 auto">续写 / 小说 / 文风</span></button><button class="mr-btn mr-icon-btn"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l8 8M11 3l-8 8"/></svg></button></div>
-  <div class="mr-row" data-static="true"><span class="mr-check"></span><button class="mr-btn" style="padding:0;flex:1;justify-content:flex-start;gap:8px"><span class="mr-name">代码重构</span><span class="mr-sub" style="flex:0 1 auto">重构 / 架构 / 接口</span></button><button class="mr-btn mr-icon-btn"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l8 8M11 3l-8 8"/></svg></button></div>
-  <button class="mr-row"><span class="mr-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 2.5v9M2.5 7h9"/></svg></span><span class="mr-name">新建预设</span></button>
+  <div class="mr-group">Task presets</div>
+  <div class="mr-row" data-static="true"><span class="mr-check"></span><button class="mr-btn" style="padding:0;flex:1;justify-content:flex-start;gap:8px"><span class="mr-name">Story continuation</span><span class="mr-sub" style="flex:0 1 auto">continue / story / style</span></button><button class="mr-btn mr-icon-btn"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l8 8M11 3l-8 8"/></svg></button></div>
+  <div class="mr-row" data-static="true"><span class="mr-check"></span><button class="mr-btn" style="padding:0;flex:1;justify-content:flex-start;gap:8px"><span class="mr-name">Code refactoring</span><span class="mr-sub" style="flex:0 1 auto">refactor / architecture / API</span></button><button class="mr-btn mr-icon-btn"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l8 8M11 3l-8 8"/></svg></button></div>
+  <button class="mr-row"><span class="mr-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 2.5v9M2.5 7h9"/></svg></span><span class="mr-name">New preset</span></button>
   <div class="mr-div"></div>
-  <div class="mr-group">更多</div>
-  <div class="mr-line" style="padding:2px 8px"><span class="mr-name" title="带图步骤：不干预 = 按普通规则；用视觉模型 = 强制走带视觉标记的模型">带图步骤</span><div class="mr-seg" title="不干预 = 按普通规则；用视觉模型 = 强制走带视觉标记的模型"><button data-active="true" title="按普通规则">不干预</button><button title="强制走带视觉标记的模型">用视觉模型</button></div></div>
-  <div class="mr-line" style="padding:2px 8px"><span class="mr-name" title="关键词 = 按预设里的 match；语义 = 每轮一次小模型判断">任务识别</span><div class="mr-seg" title="关键词 = 按预设里的 match；语义 = 每轮一次小模型判断"><button data-active="true" title="按预设里的 match 匹配">关键词</button><button title="每轮一次小模型判断">语义</button></div></div>
-  <div class="mr-line" style="padding:2px 8px"><span class="mr-name" title="上下文压力：快满时优先用便宜模型">上下文压力</span><div class="mr-seg" title="快满时优先用便宜模型"><button title="不参与判断">关</button><button data-active="true" title="上下文快满时优先便宜模型">快满省</button></div></div>
-  <div class="mr-line" style="padding:2px 8px"><span class="mr-name" title="半透明的主题菜单色会让背后的聊天内容透上来">面板背景</span><div class="mr-seg" title="选「不透明」最好读；选「跟随主题」会加毛玻璃模糊"><button data-active="true" title="用主题底色算出不透明色，文字最清楚">不透明</button><button title="沿用主题的半透明菜单色，再加背景模糊">跟随主题</button></div></div>
-  <div class="mr-line" style="padding:2px 8px"><span class="mr-name" title="跨品牌 = 换到另一个 provider 的模型；比同品牌换模型更保守">跨品牌</span><div class="mr-seg" title="允许 = 直接跨；先问 = 顶部弹出提议条等你点；禁止 = 只留在当前品牌"><button title="直接跨过去">允许</button><button data-active="true" title="先弹出提议条等你选">先问</button><button title="只留在当前品牌">禁止</button></div></div>
+  <div class="mr-group">More</div>
+  <div class="mr-line" style="padding:2px 8px"><span class="mr-name" title="Image steps: Leave alone uses normal rules; Vision model forces vision-tagged models">Image steps</span><div class="mr-seg" title="Leave alone uses normal rules; Vision model forces vision-tagged models"><button data-active="true" title="Use normal rules">Leave alone</button><button title="Force vision-tagged models">Vision model</button></div></div>
+  <div class="mr-line" style="padding:2px 8px"><span class="mr-name" title="Keywords uses preset match rules; Semantic runs a small model once per turn">Task detection</span><div class="mr-seg" title="Keywords uses preset match rules; Semantic runs a small model once per turn"><button data-active="true" title="Match preset rules">Keywords</button><button title="Run a small model once per turn">Semantic</button></div></div>
+  <div class="mr-line" style="padding:2px 8px"><span class="mr-name" title="Context pressure: prefer cheap models when nearly full">Context pressure</span><div class="mr-seg" title="Prefer cheap models when nearly full"><button title="Disable this check">Off</button><button data-active="true" title="Prefer cheap models when context is nearly full">Save when full</button></div></div>
+  <div class="mr-line" style="padding:2px 8px"><span class="mr-name" title="Translucent theme menu colors let background chat content show through">Panel background</span><div class="mr-seg" title="Opaque is easiest to read; Follow theme adds backdrop blur"><button data-active="true" title="Composite an opaque theme background for clear text">Opaque</button><button title="Use the translucent theme menu color with backdrop blur">Follow theme</button></div></div>
+  <div class="mr-line" style="padding:2px 8px"><span class="mr-name" title="Cross-brand switches providers and is more conservative than switching within a brand">Cross-brand</span><div class="mr-seg" title="Allow switches immediately; Ask shows a proposal; Off stays with the current brand"><button title="Switch immediately">Allow</button><button data-active="true" title="Show a proposal and wait for your choice">Ask</button><button title="Stay with the current brand">Off</button></div></div>
   <div class="mr-prov">
-    <div class="mr-group">其他模型 · vendor-x</div>
-    <button class="mr-chip" title="把该品牌的全部模型加入池">全加入</button>
-    <button class="mr-chip" title="把该品牌的模型全部移出池">全移除</button>
+    <div class="mr-group">Other models · vendor-x</div>
+    <button class="mr-chip" title="Add all models for this brand to the pool">Add all</button>
+    <button class="mr-chip" title="Remove all models for this brand from the pool">Remove all</button>
   </div>
-  <div class="mr-row" data-static="true"><span class="mr-check"></span><span class="mr-name">writer-pro</span><button class="mr-chip" title="点一下把它加进模型池">模型池</button></div>
-  <div class="mr-group">最近决策</div>
+  <div class="mr-row" data-static="true"><span class="mr-check"></span><span class="mr-name">writer-pro</span><button class="mr-chip" title="Click to add to the pool">Model pool</button></div>
+  <div class="mr-group">Recent decisions</div>
   <div>
     <div class="mr-line" style="padding:0 8px"><span class="mr-tag">T3.4</span><span class="mr-name" title="deepseek-official/deepseek-v4-pro">deepseek-v4-pro · high</span><span class="mr-sub">hard</span></div>
     <div class="mr-line" style="padding:0 8px"><span class="mr-tag">T3.3</span><span class="mr-name" title="deepseek-official/deepseek-flash">deepseek-flash · low</span><span class="mr-sub">standard</span></div>
     <div class="mr-line" style="padding:0 8px"><span class="mr-tag">T3.2</span><span class="mr-name" title="deepseek-official/deepseek-flash">deepseek-flash · default</span><span class="mr-sub">trivial</span></div>
   </div>
-  <div class="mr-foot"><span class="mr-dot" data-yielded="false"></span><span>已接管</span><span class="mr-name" style="text-align:right">deepseek-v4-pro · high · engineering</span></div>
+  <div class="mr-foot"><span class="mr-dot" data-yielded="false"></span><span>Active</span><span class="mr-name" style="text-align:right">deepseek-v4-pro · high · engineering</span></div>
 </div>
 <script>if (location.hash === "#light") document.documentElement.dataset.theme = "light"</script>
 
 </div>
-<h2 style="margin:48px 0 8px;font-size:14px;color:var(--dsw-alias-label-secondary);font-weight:500">半透明 vs 不透明（背景是聊天内容）</h2>
+<h2 style="margin:48px 0 8px;font-size:14px;color:var(--dsw-alias-label-secondary);font-weight:500">Translucent vs opaque (chat content in the background)</h2>
 <div class="busywrap" id="busy">
   <div class="busytext" id="busytext"></div>
   <div class="panels">
     <div class="mr-panel demo" data-bg="theme">
-      <div class="mr-head"><span class="mr-name">跟随主题</span></div>
-      <div class="mr-group">模型池</div>
-      <div class="mr-row" data-static="true"><span class="mr-check">&#10003;</span><span class="mr-name">DeepSeek V4 Pro</span><span class="mr-sub">攻坚</span></div>
-      <div class="mr-line" style="padding:0 8px 4px 34px"><span class="mr-tag">定位</span><div class="mr-seg"><button>日常</button><button data-active="true">攻坚</button></div><span class="mr-tag">价格</span><div class="mr-seg"><button>便宜</button><button>中</button><button data-active="true">贵</button></div></div>
+      <div class="mr-head"><span class="mr-name">Follow theme</span></div>
+      <div class="mr-group">Model pool</div>
+      <div class="mr-row" data-static="true"><span class="mr-check">&#10003;</span><span class="mr-name">DeepSeek V4 Pro</span><span class="mr-sub">Hard</span></div>
+      <div class="mr-line" style="padding:0 8px 4px 34px"><span class="mr-tag">Role</span><div class="mr-seg"><button>Routine</button><button data-active="true">Hard</button></div><span class="mr-tag">Price</span><div class="mr-seg"><button>Cheap</button><button>Medium</button><button data-active="true">Expensive</button></div></div>
       <div class="mr-row" data-static="true"><span class="mr-check"></span><span class="mr-name">DeepSeek Flash</span></div>
-      <div class="mr-foot"><span class="mr-dot"></span><span>已接管</span><span class="mr-name" style="text-align:right">deepseek-v4-pro · high</span></div>
+      <div class="mr-foot"><span class="mr-dot"></span><span>Active</span><span class="mr-name" style="text-align:right">deepseek-v4-pro · high</span></div>
     </div>
     <div class="mr-panel demo" data-bg="solid" id="solidDemo">
-      <div class="mr-head"><span class="mr-name">不透明</span></div>
-      <div class="mr-group">模型池</div>
-      <div class="mr-row" data-static="true"><span class="mr-check">&#10003;</span><span class="mr-name">DeepSeek V4 Pro</span><span class="mr-sub">攻坚</span></div>
-      <div class="mr-line" style="padding:0 8px 4px 34px"><span class="mr-tag">定位</span><div class="mr-seg"><button>日常</button><button data-active="true">攻坚</button></div><span class="mr-tag">价格</span><div class="mr-seg"><button>便宜</button><button>中</button><button data-active="true">贵</button></div></div>
+      <div class="mr-head"><span class="mr-name">Opaque</span></div>
+      <div class="mr-group">Model pool</div>
+      <div class="mr-row" data-static="true"><span class="mr-check">&#10003;</span><span class="mr-name">DeepSeek V4 Pro</span><span class="mr-sub">Hard</span></div>
+      <div class="mr-line" style="padding:0 8px 4px 34px"><span class="mr-tag">Role</span><div class="mr-seg"><button>Routine</button><button data-active="true">Hard</button></div><span class="mr-tag">Price</span><div class="mr-seg"><button>Cheap</button><button>Medium</button><button data-active="true">Expensive</button></div></div>
       <div class="mr-row" data-static="true"><span class="mr-check"></span><span class="mr-name">DeepSeek Flash</span></div>
-      <div class="mr-foot"><span class="mr-dot"></span><span>已接管</span><span class="mr-name" style="text-align:right">deepseek-v4-pro · high</span></div>
+      <div class="mr-foot"><span class="mr-dot"></span><span>Active</span><span class="mr-name" style="text-align:right">deepseek-v4-pro · high</span></div>
     </div>
   </div>
 </div>
@@ -218,6 +218,7 @@ body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:ce
 </style>
 <script>
 (function () {
+  if (location.hash === "#light") document.documentElement.dataset.theme = "light";
   if (location.hash === "#busy") {
     var main = document.querySelector(".main");
     if (main) main.style.display = "none";
@@ -226,7 +227,7 @@ body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:ce
   }
   var lines = [];
   for (var i = 0; i < 26; i++) {
-    lines.push("这是一段很长的助手回复：我先看了下 routing.js 里的评分逻辑，然后把 tier 和 cost 分别映射成定位与价格 —— 第 " + (i + 1) + " 行，用来模拟背后真实的聊天文字。");
+    lines.push("This is a long assistant response: I inspected the scoring logic in routing.js, then mapped tier and cost to role and price - line " + (i + 1) + ", simulating real chat content behind the panel.");
   }
   document.getElementById("busytext").textContent = lines.join(" ");
   // The same measurement the plugin uses: read the theme token, compose it opaque.

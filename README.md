@@ -1,6 +1,9 @@
-# dsh-model-router
+# dsh-model-router-en
 
-English | [中文](README.zh.md)
+English-only fork: [ebluffy/dsh-model-router](https://github.com/ebluffy/dsh-model-router).
+[Legacy documentation link](README.zh.md).
+
+Based on [Neptune810/dsh-model-router](https://github.com/Neptune810/dsh-model-router).
 
 A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) plugin that keeps a pool of
 models and routes every step to one of them with its reasoning effort set. Thinking stays on —
@@ -29,9 +32,9 @@ composer control's **resume** action.
 
 | Scope | Owns |
 | --- | --- |
-| `full` — 模型+思考 / Model+Effort | model + reasoning effort |
-| `effort` — 思考 / Effort | one model you pick in the panel: the router only sets that model's thinking level |
-| `model` — 模型 / Model | model only; the session keeps its thinking level |
+| `full` - Model+Effort | model + reasoning effort |
+| `effort` - Effort | one model you pick in the panel: the router only sets that model's thinking level |
+| `model` - Model | model only; the session keeps its thinking level |
 
 In `effort` scope the panel first asks you to pick exactly one model
 (`POST /model-router/effort-model`, reported by `/state` as `effortModel` / `effectiveEffortModel`).
@@ -50,7 +53,7 @@ pool:
   - { id: deepseek-official/deepseek-flash, cost: 1, tier: cheap }
   - { id: deepseek-official/deepseek-v4-pro, cost: 8, tier: strong, maxPerTask: 3 }
   - { id: deepseek-official/deepseek-v4-flash-vision-exp, cost: 1, tags: [vision] }
-  - { id: vendor-x/writer-pro, cost: 20, weights: { 小说续写: 95 } }
+  - { id: vendor-x/writer-pro, cost: 20, weights: { Story continuation: 95 } }
 ```
 
 `tier: strong` is what hard steps and evidence escalation prefer; `cost` feeds
@@ -61,11 +64,11 @@ pool:
 
 ```yaml
 presets:
-  小说续写:
-    match: ["续写", "小说", "文风", "/chapter\\s+\\d+/i"]
+  Story continuation:
+    match: ["continue", "story", "writing style", "/chapter\\s+\\d+/i"]
     weights: { "vendor-x/writer-pro": 95, "deepseek-official/deepseek-v4-pro": 60 }
-  代码重构:
-    match: ["重构", "refactor", "架构"]
+  Code refactoring:
+    match: ["refactor", "architecture"]
     weights: { "deepseek-official/deepseek-v4-pro": 90 }
 ```
 
@@ -86,18 +89,17 @@ below the shipped `ModelSelect` (priority 0, from `@deepseek-ai/dsh-client-ui-mo
 slots engine renders the lowest priority, so the router's merged control takes over the composer model
 cell and the composer shows a single control instead of a second chip beside the official picker.
 
-That one control keeps both halves. The official half is 本会话模型 / Session model and 推理等级 /
-Reasoning effort, driven by the real ModelDirectory through `props.directory.store` subscribe,
+That one control keeps both halves. The official half is Session model and Reasoning effort, driven by the real ModelDirectory through `props.directory.store` subscribe,
 `props.load()` and `props.select({ provider, model, reasoningEffort })`: provider/model groups, the
 current row's check, the pending spinner, the provider-default row, catalog loading / error / retry, and
-the official "model · effort" trigger label. Below it sit the router's own groups: the 接管 status,
-控制范围 (模型+思考 / 思考 / 模型) and 任务类型, then the model list itself — **the pool is folded into the
-model rows**: every session-model row carries a 模型池 / Model pool chip on its right, tapping it pools or
-unpools that model, a pooled row expands its 定位 / 价格 / 视觉 controls underneath, and pool entries
-whose provider group is not in the directory gather under 其他模型 / Other models with the manual
-"type a model id" row. **Rows are grouped by provider**, each group header carrying 全加入 / Add all and
-全移除 / Remove all, and the panel head carries 自动定价 / Auto price and 联网定价 / Fetch prices to fill
-the 便宜 / 中 / 贵 cost level of entries you have not labelled by hand. Then 任务预设 and 更多. Every mutation goes to the host over same-origin
+the official "model · effort" trigger label. Below it sit the router's own groups: the Engaged status,
+Scope (Model+Effort / Effort / Model) and Task type, then the model list itself — **the pool is folded into the
+model rows**: every session-model row carries a Model pool chip on its right, tapping it pools or
+unpools that model, a pooled row expands its Role / Price / Vision controls underneath, and pool entries
+whose provider group is not in the directory gather under Other models with the manual
+"type a model id" row. **Rows are grouped by provider**, each group header carrying Add all and
+Remove all, and the panel head carries Auto price and Fetch prices to fill
+the Cheap / Medium / Expensive cost level of entries you have not labelled by hand. Then Task presets and More. Every mutation goes to the host over same-origin
 `/model-router/*` routes, and the per-call route row in the conversation is unchanged.
 
 The old `conversation.input.right` chip (`model-router:composer-control`, order 20) is still registered,
@@ -126,9 +128,9 @@ choice of its own inherits it. Choices stay per conversation: once you configure
 `sessions` entry wins and the other conversations are unaffected.
 
 An inherited plan is not a decision you made in *this* conversation, so the panel opens with a
-warn-tinted bar at the top: 已沿用上一次的选择 / carried over from your last choice, or
-新对话：先确认这次的路由方案 / new conversation — confirm this routing plan when there was nothing to
-inherit yet. It lists the effective 范围 / 思考模型 / 任务类型 / 模型池 with a 确认 / Confirm button
+warn-tinted bar at the top: carried over from your last choice, or
+new conversation — confirm this routing plan when there was nothing to
+inherit yet. It lists the effective Scope / Effort model / Task type / Model pool with a Confirm button
 (`POST /model-router/confirm { sessionId, plan }`), and the composer trigger carries a pulsing amber dot
 until you answer. Confirming records the plan key for that session — `/state` reports `plan`, `planKey`
 and `planConfirmed` — and neither the bar nor the dot comes back in that conversation; changing the scope,
@@ -137,21 +139,21 @@ the bound model, the task type or the pool produces a different key and asks onc
 ## Multiple brands: grouping, automatic pricing and the cross-brand guard (v0.14.0)
 
 The pool used to be a flat list, so a second brand took one click per model. The model list is now **grouped
-by provider** — every official directory group and every brand under 其他模型 / Other models — and each
-group header carries 全加入 / Add all and 全移除 / Remove all, so a whole brand enters or leaves the pool
+by provider** — every official directory group and every brand under Other models — and each
+group header carries Add all and Remove all, so a whole brand enters or leaves the pool
 in one click.
 
 Costs no longer have to be labelled by hand. A built-in **relative-price classifier** (`lib/pricing.js`,
-pure and dependency-free) maps a model name onto 便宜 / 中 / 贵 (cost 1 / 4 / 8) for the common DeepSeek,
-OpenAI, Anthropic, Google, Qwen and Llama families; 自动定价 / Auto price uses it plus any stored
-OpenRouter snapshot, and 联网定价 / Fetch prices pulls a fresh snapshot first (20 s timeout). Each pool
+pure and dependency-free) maps a model name onto Cheap / Medium / Expensive (cost 1 / 4 / 8) for the common DeepSeek,
+OpenAI, Anthropic, Google, Qwen and Llama families; Auto price uses it plus any stored
+OpenRouter snapshot, and Fetch prices pulls a fresh snapshot first (20 s timeout). Each pool
 entry records where its level came from in `costSource` (`builtin` | `openrouter` | `manual`), and an entry
 you labelled by hand is never overwritten.
 
-Crossing brands is its own decision. 跨品牌 / Cross-brand has three values — 允许 / 先问 / 禁止 (allow /
-ask / off, default ask). Under `ask`, when the next step wants a model from another brand the host **stays
+Crossing brands is its own decision. Cross-brand has three values — allow /
+ask / off (default ask). Under `ask`, when the next step wants a model from another brand the host **stays
 on the current brand**, exposes the candidate as `state.cross.proposal`, and the panel shows a propose bar
-with 只切一次 / Switch once, 本会话允许 / Allow in this chat and 不再跨品牌 / Never cross brands. A pool
+with Switch once, Allow in this chat and Never cross brands. A pool
 holding only another brand still routes (the guard needs a same-brand alternative), and the hysteresis
 memory can no longer resurrect a model the guard excluded.
 
@@ -172,10 +174,10 @@ The composer control is the whole configuration surface — no JSON or YAML:
 
 | Section | What you do |
 | --- | --- |
-| mode | click 模型+思考 / 思考 / 模型; in 思考, pick the one model the router may tune; a manual pick adds a **resume** button |
+| mode | click Model+Effort / Effort / Model; in Effort, pick the one model the router may tune; a manual pick adds a **resume** button |
 | task type | pick *auto* (keyword rules) or one of your presets |
 | model pool | **tick models from the live catalog**, then set tier / cost / vision with dropdowns |
-| task presets | **+ 新建预设** → click a keyword pack (写作 / 代码 / 翻译 / 分析) or add a word → choose each pooled model's weight |
+| task presets | **+ New preset** → click a keyword pack (Writing / Code / Translation / Analysis) or add a word → choose each pooled model's weight |
 | more | image steps, task detection (rules / semantic), context pressure |
 
 Everything persists in `<profile>/.model-router/state.json` through the same-origin
@@ -193,7 +195,7 @@ deepseek-official/deepseek-v4-pro · high
 The host folds the session's own events into the `modelRouterRoute` session projection
 (`stateVersion` 1): `request/header` gives the provider, model and effort in force, `step/start`
 gives the turn and step, and `tool/call` records that pair under the call id. The effort is `null`
-when the adapter owns the default, and those rows show the localized **默认** / **default** label.
+when the adapter owns the default, and those rows show the **default** label.
 The projection keeps the last 200 calls per session and drops the oldest.
 
 The client half registers a `model-router-route` conversation Definition on every `tool/call` and
@@ -263,8 +265,8 @@ most 60 tokens, and `standard` required zero tool calls. And with `allowMax: fal
 `max` is demoted to `high`, so `hard` and `engineering` applied the same effort — evidence
 escalation changed nothing for a task that was already engineering.
 
-Measured before: `帮我把这个文件里的日志改成中文` ran `standard`/`low` at 0 tools, then
-`engineering`/`high` at 1, 3, 6, 12 and 25 tools for the rest of the task; `翻译一下这句话` with one
+Measured before: `Help me translate the logs in this file into Chinese` ran `standard`/`low` at 0 tools, then
+`engineering`/`high` at 1, 3, 6, 12 and 25 tools for the rest of the task; `Translate this sentence` with one
 tool also went to `high`.
 
 `scoring.toolCallClass` (default `standard`) decides whether a tool loop can earn the engineering class
@@ -359,13 +361,13 @@ The plugin reads its config from its row in the profile's `cordis.patch.yml`:
 `dsh plugin` is a pnpm forwarder, so any pnpm specifier works. From the npm registry:
 
 ```sh
-dsh plugin --profile web add @neptune810/dsh-model-router
+dsh plugin --profile web add dsh-model-router-en
 ```
 
 or straight from the repository:
 
 ```sh
-dsh plugin --profile web add github:Neptune810/dsh-model-router
+dsh plugin --profile web add github:ebluffy/dsh-model-router
 ```
 
 Restart `dsh web` afterwards. Because the router registers listeners at boot, a reload is not

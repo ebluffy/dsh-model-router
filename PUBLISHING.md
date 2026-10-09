@@ -19,16 +19,15 @@ An entry qualifies when:
 
 ## The submission file
 
-Add `data/plugins/Neptune810__dsh-model-router.yml` to a fork of
+Add `data/plugins/ebluffy__dsh-model-router.yml` to a fork of
 `awesome-dsh-plugin/awesome-dsh-plugin`. That single file is the whole submission.
 
 ```yaml
-url: https://github.com/Neptune810/dsh-model-router
-name: Neptune810/dsh-model-router
+url: https://github.com/ebluffy/dsh-model-router
+name: ebluffy/dsh-model-router
 category: model
 description:
   en: Sets the DeepSeek flash model's reasoning effort per step — low for a cheap or plain request, high for engineering work and agent tool loops — and raises it only on repeated tool failures. Thinking stays on, because DeepSeek rejects a thinking-enabled request whose history contains a tool call made with thinking off. The model itself never changes; effort max is opt-in.
-  zh: 按步骤设置 DeepSeek flash 模型的思考等级：廉价或普通请求用 low，工程类工作与 agent 工具循环用 high，只有反复出现工具失败才继续升档。思考始终保持开启——DeepSeek 会拒绝「历史里存在关闭思考时产生的工具调用」的思考模式请求。模型本身不会改变，max 档需手动开启。
 ```
 
 `description.zh` is optional — a maintainer will add it if you leave it out. `description.en` is
@@ -39,7 +38,7 @@ required and must be quoted when it contains `: `.
 - [x] `dsh.bundle.patch` declared in `package.json`
 - [x] `cordis.patch.yml` present at the repo root
 - [x] real code with tests (`node --test`)
-- [x] repo created on GitHub, public — <https://github.com/Neptune810/dsh-model-router>
+- [x] repo created on GitHub, public — <https://github.com/ebluffy/dsh-model-router>
 - [x] `dsh-plugin` topic added
 - [x] repo is at least 1 day old (created 2026-09-13)
 - [x] PR opened — [awesome-dsh-plugin#5137](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/5137)
@@ -85,7 +84,7 @@ made 0.10.0 fail the page boot audit (see the 0.11.0 changelog entry).
 
 ## npm
 
-Published: **`@neptune810/dsh-model-router@0.11.0`** (2026-10-01). Earlier releases: 0.6.12, 0.6.11, 0.6.10, 0.6.9, 0.6.8, 0.6.7, 0.6.6, 0.6.5, 0.6.4, 0.6.3, 0.6.2, 0.6.1, 0.6.0, 0.5.0, 0.4.0, 0.3.0 (2026-09-15). The 0.7.0–0.10.1
+Published: **`dsh-model-router-en@0.11.0`** (2026-10-01). Earlier releases: 0.6.12, 0.6.11, 0.6.10, 0.6.9, 0.6.8, 0.6.7, 0.6.6, 0.6.5, 0.6.4, 0.6.3, 0.6.2, 0.6.1, 0.6.0, 0.5.0, 0.4.0, 0.3.0 (2026-09-15). The 0.7.0–0.10.1
 line was developed in the working tree but never tagged, so 0.11.0 is the first registry release that
 carries it.
 Listing does not depend on it —
@@ -113,7 +112,7 @@ One-time setup — npmjs.com → the package → **Settings → Trusted Publishi
 | field | value |
 | --- | --- |
 | Provider | GitHub Actions |
-| Organization or user | `Neptune810` |
+| Organization or user | `ebluffy` |
 | Repository | `dsh-model-router` |
 | Workflow filename | `publish.yml` |
 | Environment name | *(leave empty)* |
@@ -144,7 +143,7 @@ required to publish packages.
 ```
 
 `npm publish` from an interactive terminal prompts for an OTP and works. For anything
-non-interactive, create an **Access Token** on npmjs.com with *Packages and scopes* = `@neptune810`
+non-interactive, create an **Access Token** on npmjs.com with access to `dsh-model-router-en`
 (Read and write) and **Bypass 2FA** enabled, then
 
 ```sh
@@ -170,7 +169,7 @@ A version bump never needs a catalog change: the market reads this repository (a
 package) on its own. The *description* does need one when the behaviour it describes changes — 0.4.0
 stopped disabling thinking for cheap steps, so the entry's `description.en` / `description.zh` are
 refreshed in a follow-up PR to `awesome-dsh-plugin`. Copy the block above into
-`data/plugins/Neptune810__dsh-model-router.yml`.
+`data/plugins/ebluffy__dsh-model-router.yml`.
 
 One wrinkle worth knowing: right after a *first* publish the packument can keep returning 404 for a
 few minutes, because the CDN cached the earlier not-found lookup — the availability check you ran

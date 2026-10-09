@@ -12,7 +12,7 @@ delete process.env.DSH_PROFILE_DIR
 
 const ROUTES = { trivial: { effort: 'low' }, standard: { effort: 'low' }, engineering: { effort: 'high' }, hard: { effort: 'high' } }
 /** A dense engineering brief classifies as "hard", which is what lifts the strong tier. */
-const HARD_BRIEF = '重构 架构 设计 规划 迁移 优化 性能 并发 并行 调试 诊断'
+const HARD_BRIEF = 'refactor architecture design planning migration optimization performance concurrency parallel debugging diagnosis'
 const POOL = [
   { id: 'deepseek-official/deepseek-flash', cost: 1, tier: 'cheap' },
   { id: 'deepseek-official/deepseek-v4-pro', cost: 8, tier: 'strong' },
@@ -104,7 +104,7 @@ test('full scope routes hard work to the strong pool model and cheap work to fla
   assert.equal(hard.provider, 'deepseek-official')
 
   const agent2 = agentWith()
-  emit(host, 'agent/inbox/claimed', { agent: agent2, ...claimed('翻译一下这句话') })
+  emit(host, 'agent/inbox/claimed', { agent: agent2, ...claimed('Translate this sentence') })
   const cheap = await request(host, { agent: agent2, turn: 1, step: 0 }, seed())
   assert.equal(cheap.model, 'deepseek-flash')
   assert.equal(cheap.reasoningEffort, 'low')
@@ -250,12 +250,12 @@ test('the pool editor and preset editor round-trip through the routes', async ()
 
 test('a pinned task type overrides the keyword rules', async () => {
   const presets = {
-    novel: { match: ['续写'], weights: { 'deepseek-official/deepseek-v4-pro': 90, 'deepseek-official/deepseek-flash': 10 } },
+    novel: { match: ['continue writing'], weights: { 'deepseek-official/deepseek-v4-pro': 90, 'deepseek-official/deepseek-flash': 10 } },
     refactor: { match: ['refactor'], weights: { 'deepseek-official/deepseek-flash': 95, 'deepseek-official/deepseek-v4-pro': 5 } },
   }
   const host = makeHost({ pool: POOL, routes: ROUTES, presets })
   const agent = agentWith()
-  emit(host, 'agent/inbox/claimed', { agent, ...claimed('写点别的') })
+  emit(host, 'agent/inbox/claimed', { agent, ...claimed('Write something else') })
 
   const pinned = await call(host.routes.get('/model-router/task-type'), {
     method: 'POST', url: '/model-router/task-type', headers: { origin: 'http://localhost', host: 'localhost' },
@@ -282,13 +282,13 @@ test('third-party models route with their own effort vocabulary', async () => {
         { id: 'deepseek-official/deepseek-flash', cost: 1, tier: 'cheap' },
         { id: 'vendor-x/writer-pro', cost: 4, tier: 'strong', weights: { novel: 99 } },
       ],
-      presets: { novel: { match: ['续写'] } },
+      presets: { novel: { match: ['continue writing'] } },
       routes: { ...ROUTES, standard: { effort: 'max' } },
     },
     { llm: { resolveModel: async () => ({ reasoning: { efforts: [{ id: 'low' }, { id: 'high' }] } }) } },
   )
   const agent = agentWith()
-  emit(host, 'agent/inbox/claimed', { agent, ...claimed('帮我续写这一段') })
+  emit(host, 'agent/inbox/claimed', { agent, ...claimed('Continue writing this passage') })
   const out = await request(host, { agent, turn: 1, step: 0 }, seed())
   assert.equal(out.provider, 'vendor-x')
   assert.equal(out.model, 'writer-pro')
@@ -333,14 +333,14 @@ test('image routing sends image steps to the vision model and text steps back', 
     routes: ROUTES,
     imagePolicy: 'vision',
   })
-  const agent = agentWith([{ role: 'user', content: [{ type: 'text', text: '看这张图' }, { type: 'image' }] }])
-  emit(host, 'agent/inbox/claimed', { agent, ...claimed('看这张图') })
+  const agent = agentWith([{ role: 'user', content: [{ type: 'text', text: 'Look at this image' }, { type: 'image' }] }])
+  emit(host, 'agent/inbox/claimed', { agent, ...claimed('Look at this image') })
 
   const image = await request(host, { agent, turn: 1, step: 0 }, seed())
   assert.equal(image.model, 'deepseek-v4-flash-vision-exp')
 
   // The image stays task-scoped: a new task without one returns to the normal tier.
-  emit(host, 'agent/inbox/claimed', { agent, turn: 2, message: { content: '改个变量名' } })
+  emit(host, 'agent/inbox/claimed', { agent, turn: 2, message: { content: 'Rename a variable' } })
   const text = await request(host, { agent, turn: 2, step: 0 }, seed())
   assert.notEqual(text.model, 'deepseek-v4-flash-vision-exp')
 })
@@ -360,15 +360,15 @@ test('a subagent spends the cheap tier even on hard work', async () => {
 })
 
 test('the active todo feeds task-type matching', async () => {
-  const presets = { novel: { match: ['续写'], weights: { 'deepseek-official/deepseek-v4-pro': 95 } } }
+  const presets = { novel: { match: ['continue writing'], weights: { 'deepseek-official/deepseek-v4-pro': 95 } } }
   const registered = []
   const projections = {
-    stateOf: (session, key) => (key === 'todos' ? [{ content: '续写第三章', status: 'in_progress' }] : undefined),
+    stateOf: (session, key) => (key === 'todos' ? [{ content: 'Continue writing chapter three', status: 'in_progress' }] : undefined),
     register: (definition) => { registered.push(definition); return () => {} },
   }
   const host = makeHost({ pool: POOL, routes: ROUTES, presets }, { sessionProjections: projections })
   const agent = agentWith()
-  emit(host, 'agent/inbox/claimed', { agent, ...claimed('继续') })
+  emit(host, 'agent/inbox/claimed', { agent, ...claimed('Continue') })
   const out = await request(host, { agent, turn: 1, step: 0 }, seed())
   assert.equal(out.model, 'deepseek-v4-pro', 'the todo text matched the preset, not the prompt')
 })
@@ -403,10 +403,10 @@ test('/router reports the live routing state', async () => {
 test('classifier llm classifies once per turn and falls back to the rules', async () => {
   let calls = 0
   const llm = { stream: async function* stream() { calls += 1; yield { type: 'text-delta', index: 0, text: 'novel' } } }
-  const presets = { novel: { match: ['绝不出现的词'], weights: { 'deepseek-official/deepseek-v4-pro': 99 } } }
+  const presets = { novel: { match: ['a phrase that never appears'], weights: { 'deepseek-official/deepseek-v4-pro': 99 } } }
   const host = makeHost({ pool: POOL, routes: ROUTES, presets, classifier: 'llm' }, { llm })
   const agent = agentWith()
-  emit(host, 'agent/inbox/claimed', { agent, ...claimed('写点东西') })
+  emit(host, 'agent/inbox/claimed', { agent, ...claimed('Write something') })
   const first = await request(host, { agent, turn: 1, step: 0 }, seed())
   assert.equal(first.model, 'deepseek-v4-pro')
   assert.equal(calls, 1)
@@ -415,7 +415,7 @@ test('classifier llm classifies once per turn and falls back to the rules', asyn
 
   const broken = makeHost({ pool: POOL, routes: ROUTES, presets, classifier: 'llm' }, { llm: { stream: () => { throw new Error('no classifier model') } } })
   const agent2 = agentWith()
-  emit(broken, 'agent/inbox/claimed', { agent: agent2, ...claimed('翻译一句话') })
+  emit(broken, 'agent/inbox/claimed', { agent: agent2, ...claimed('Translate a sentence') })
   const fallback = await request(broken, { agent: agent2, turn: 1, step: 0 }, seed())
   assert.equal(fallback.model, 'deepseek-flash')
 })
@@ -515,7 +515,7 @@ test('a scope pick before the session exists becomes the default', async () => {
 })
 
 test('a pick for a session that has not run yet is reflected by /state', async () => {
-  const host = makeHost({ pool: POOL, routes: ROUTES, presets: { novel: { match: ['续写'], weights: {} } } })
+  const host = makeHost({ pool: POOL, routes: ROUTES, presets: { novel: { match: ['continue writing'], weights: {} } } })
   const headers = { origin: 'http://localhost', host: 'localhost' }
   await call(host.routes.get('/model-router/control'), {
     method: 'POST', url: '/model-router/control', headers, body: { sessionId: 'fresh-session', control: 'effort' },
@@ -539,7 +539,7 @@ const CROSS_POOL = [
   { id: 'deepseek-official/deepseek-flash', cost: 1, tier: 'cheap' },
   { id: 'vendor-x/writer-pro', cost: 4, tier: 'strong', weights: { novel: 99 } },
 ]
-const CROSS_PRESETS = { novel: { match: ['续写'], weights: { 'vendor-x/writer-pro': 99 } } }
+const CROSS_PRESETS = { novel: { match: ['continue writing'], weights: { 'vendor-x/writer-pro': 99 } } }
 const SAME_ORIGIN = { origin: 'http://localhost', host: 'localhost' }
 
 async function stateOf(host, sessionId = 's1') {
@@ -552,7 +552,7 @@ async function stateOf(host, sessionId = 's1') {
 test('a cross-provider switch is proposed, not taken, by default', async () => {
   const host = makeHost({ pool: CROSS_POOL, routes: ROUTES, presets: CROSS_PRESETS })
   const agent = agentWith()
-  emit(host, 'agent/inbox/claimed', { agent, ...claimed('帮我续写这一段') })
+  emit(host, 'agent/inbox/claimed', { agent, ...claimed('Continue writing this passage') })
   const held = await request(host, { agent, turn: 1, step: 0 }, seed())
   assert.equal(held.provider, 'deepseek-official', 'the conversation stays on its own brand')
   assert.equal(held.model, 'deepseek-flash')
@@ -569,7 +569,7 @@ test('a cross-provider switch is proposed, not taken, by default', async () => {
 test('allowing a conversation lets it cross to the other brand', async () => {
   const host = makeHost({ pool: CROSS_POOL, routes: ROUTES, presets: CROSS_PRESETS })
   const agent = agentWith()
-  emit(host, 'agent/inbox/claimed', { agent, ...claimed('帮我续写这一段') })
+  emit(host, 'agent/inbox/claimed', { agent, ...claimed('Continue writing this passage') })
   await request(host, { agent, turn: 1, step: 0 }, seed())
 
   const allowed = await call(host.routes.get('/model-router/cross'), {
@@ -578,7 +578,7 @@ test('allowing a conversation lets it cross to the other brand', async () => {
   })
   assert.equal(allowed.status, 200)
 
-  emit(host, 'agent/inbox/claimed', { agent, ...claimed('帮我续写这一段', 2) })
+  emit(host, 'agent/inbox/claimed', { agent, ...claimed('Continue writing this passage', 2) })
   const crossed = await request(host, { agent, turn: 2, step: 0 }, seed())
   assert.equal(crossed.provider, 'vendor-x')
   assert.equal(crossed.model, 'writer-pro')
@@ -588,7 +588,7 @@ test('allowing a conversation lets it cross to the other brand', async () => {
 test('approving the proposal crosses once, then the new brand is the anchor', async () => {
   const host = makeHost({ pool: CROSS_POOL, routes: ROUTES, presets: CROSS_PRESETS })
   const agent = agentWith()
-  emit(host, 'agent/inbox/claimed', { agent, ...claimed('帮我续写这一段') })
+  emit(host, 'agent/inbox/claimed', { agent, ...claimed('Continue writing this passage') })
   await request(host, { agent, turn: 1, step: 0 }, seed())
 
   const once = await call(host.routes.get('/model-router/cross'), {
@@ -598,7 +598,7 @@ test('approving the proposal crosses once, then the new brand is the anchor', as
   assert.equal(once.status, 200)
   assert.equal(JSON.parse(once.payload).once, 'vendor-x/writer-pro')
 
-  emit(host, 'agent/inbox/claimed', { agent, ...claimed('帮我续写这一段', 2) })
+  emit(host, 'agent/inbox/claimed', { agent, ...claimed('Continue writing this passage', 2) })
   const crossed = await request(host, { agent, turn: 2, step: 0 }, seed())
   assert.equal(crossed.provider, 'vendor-x')
   assert.equal(crossed.model, 'writer-pro')
@@ -608,7 +608,7 @@ test('approving the proposal crosses once, then the new brand is the anchor', as
 test('never keeps the conversation on its own brand with no proposal', async () => {
   const host = makeHost({ pool: CROSS_POOL, routes: ROUTES, presets: CROSS_PRESETS, crossProvider: 'never' })
   const agent = agentWith()
-  emit(host, 'agent/inbox/claimed', { agent, ...claimed('帮我续写这一段') })
+  emit(host, 'agent/inbox/claimed', { agent, ...claimed('Continue writing this passage') })
   const held = await request(host, { agent, turn: 1, step: 0 }, seed())
   assert.equal(held.provider, 'deepseek-official')
   assert.equal(held.model, 'deepseek-flash')
@@ -624,7 +624,7 @@ test('a pool that only holds another brand still routes (guard needs an anchor b
     presets: CROSS_PRESETS,
   })
   const agent = agentWith()
-  emit(host, 'agent/inbox/claimed', { agent, ...claimed('帮我续写这一段') })
+  emit(host, 'agent/inbox/claimed', { agent, ...claimed('Continue writing this passage') })
   const out = await request(host, { agent, turn: 1, step: 0 }, seed())
   assert.equal(out.provider, 'vendor-x')
   assert.equal(out.model, 'writer-pro')
@@ -747,7 +747,7 @@ test('a plan confirmed before the conversation ran survives the live state being
   assert.equal((await sessionState(host, 's1')).planConfirmed, true, 'the store alone already answers true')
 
   const agent = agentWith()
-  emit(host, 'agent/inbox/claimed', { agent, ...claimed('写一个函数') })
+  emit(host, 'agent/inbox/claimed', { agent, ...claimed('Write a function') })
   await request(host, { agent, turn: 1, step: 0 }, seed())
 
   const after = await sessionState(host, 's1')
@@ -758,7 +758,7 @@ test('a plan confirmed before the conversation ran survives the live state being
 test('changing the pool or the scope still asks again after a confirmation', async () => {
   const host = makeHost({ pool: POOL, routes: ROUTES })
   const agent = agentWith()
-  emit(host, 'agent/inbox/claimed', { agent, ...claimed('写一个函数') })
+  emit(host, 'agent/inbox/claimed', { agent, ...claimed('Write a function') })
   await request(host, { agent, turn: 1, step: 0 }, seed())
   const key = (await sessionState(host, 's1')).planKey
   await call(host.routes.get('/model-router/confirm'), {

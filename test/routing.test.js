@@ -66,20 +66,20 @@ test('normalizePool accepts strings and objects, drops junk, and falls back to t
 test('matchPreset honours user rules: substrings, case, and /regex/ literals', () => {
   const c = cfg({
     presets: {
-      novel: { match: ['续写', 'novel'] },
-      refactor: { match: ['/refactor|重构/i'] },
+      novel: { match: ['continue writing', 'novel'] },
+      refactor: { match: ['/refactor|restructure/i'] },
     },
   })
-  assert.equal(matchPreset(c, '帮我续写这一段'), 'novel')
+  assert.equal(matchPreset(c, 'Continue writing this passage'), 'novel')
   assert.equal(matchPreset(c, 'continue the NOVEL please'), 'novel')
-  assert.equal(matchPreset(c, '重构这个模块'), 'refactor')
-  assert.equal(matchPreset(c, '写点别的'), null)
+  assert.equal(matchPreset(c, 'Restructure this module'), 'refactor')
+  assert.equal(matchPreset(c, 'Write something else'), null)
   assert.equal(matchPreset(c, ''), null)
 })
 
 test('preset weights come from either the entry or the preset table, entry first', () => {
   const c = cfg({
-    presets: { novel: { match: ['续写'], weights: { 'a/b': 90, 'c/d': 80 } } },
+    presets: { novel: { match: ['continue writing'], weights: { 'a/b': 90, 'c/d': 80 } } },
     pool: [{ id: 'a/b', weights: { novel: 70 } }, { id: 'c/d' }, { id: 'e/f' }],
   })
   const pool = normalizePool(c)
@@ -104,7 +104,7 @@ test('scores prefer the cheap tier by default and the strong tier for hard work'
 
 test('a user weight overrides the built-in tier preference', () => {
   const c = cfg({
-    presets: { novel: { match: ['续写'], weights: { 'deepseek-official/deepseek-flash': 95, 'deepseek-official/deepseek-v4-pro': 40 } } },
+    presets: { novel: { match: ['continue writing'], weights: { 'deepseek-official/deepseek-flash': 95, 'deepseek-official/deepseek-v4-pro': 40 } } },
     pool: POOL,
   })
   const pool = normalizePool(c)

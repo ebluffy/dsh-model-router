@@ -31,10 +31,10 @@ function sig(over) {
   )
 }
 
-const BRIEF = '重构 架构 设计 规划 迁移 优化 性能 并发 并行 调试 诊断'
+const BRIEF = 'refactor architecture design planning migration optimization performance concurrency parallel debugging diagnosis'
 
 test('trivial: a short cheap-intent step stays cheap without disabling thinking', () => {
-  const d = decideRoute(cfg, resolved, sig({ text: '翻译这句话：hello world' }))
+  const d = decideRoute(cfg, resolved, sig({ text: 'Translate this sentence: hello world' }))
   assert.equal(d.stepClass, 'trivial')
   assert.equal(d.effort, 'low')
   assert.equal(d.model, 'deepseek-flash')
@@ -44,7 +44,7 @@ test('trivial: a short cheap-intent step stays cheap without disabling thinking'
 
 test('thinking stays on: a hand-written off route is raised to low', () => {
   const offCfg = normalizeConfig({ routes: { trivial: { effort: 'off' } } })
-  const d = decideRoute(offCfg, resolved, sig({ text: '翻译这句话：hello world' }))
+  const d = decideRoute(offCfg, resolved, sig({ text: 'Translate this sentence: hello world' }))
   assert.equal(d.stepClass, 'trivial')
   assert.equal(d.effort, 'low')
   assert.ok(d.reason.some((r) => r.includes('thinking stays on')))
@@ -52,16 +52,16 @@ test('thinking stays on: a hand-written off route is raised to low', () => {
 
 test('allowThinkingOff is the escape hatch for a non-thinking session', () => {
   const offCfg = normalizeConfig({ allowThinkingOff: true, routes: { trivial: { effort: 'off' } } })
-  assert.equal(decideRoute(offCfg, resolved, sig({ text: '翻译这句话' })).effort, 'off')
+  assert.equal(decideRoute(offCfg, resolved, sig({ text: 'Translate this sentence' })).effort, 'off')
   // The shipped table no longer asks for off at all, so the flag alone changes nothing.
   assert.equal(
-    decideRoute(normalizeConfig({ allowThinkingOff: true }), resolved, sig({ text: '翻译这句话' })).effort,
+    decideRoute(normalizeConfig({ allowThinkingOff: true }), resolved, sig({ text: 'Translate this sentence' })).effort,
     'low'
   )
 })
 
 test('auto routing never disables thinking across a signal sweep', () => {
-  const corpus = ['翻译 hello', '总结一下', 'continue', BRIEF, 'refactor the parser and add tests']
+  const corpus = ['Translate hello', 'Summarize this', 'continue', BRIEF, 'refactor the parser and add tests']
   for (const text of corpus) {
     for (const toolCalls of [0, 3, 50]) {
       for (const escalations of [0, 1, 2]) {
@@ -84,7 +84,7 @@ test('toolCallWithoutReasoning flags the history DeepSeek rejects', () => {
 })
 
 test('standard: a plain short request runs at low', () => {
-  const d = decideRoute(cfg, resolved, sig({ text: '帮我看看这段说明对不对' }))
+  const d = decideRoute(cfg, resolved, sig({ text: 'Check whether this description is correct' }))
   assert.equal(d.stepClass, 'standard')
   assert.equal(d.effort, 'low')
 })
@@ -147,7 +147,7 @@ test('allowMax: hard reaches max only when the gate is open', () => {
 })
 
 test('the router only ever emits the one configured model', () => {
-  const corpus = ['翻译 hi', '帮我看看', 'continue', BRIEF, FENCE + 'js' + FENCE]
+  const corpus = ['Translate hi', 'Take a look', 'continue', BRIEF, FENCE + 'js' + FENCE]
   for (const text of corpus) {
     for (const toolCalls of [0, 5]) {
       for (const escalations of [0, 1, 2]) {
@@ -188,21 +188,21 @@ test('no ratchet: turn depth contributes no score by default', () => {
 })
 
 test('evidence escalation lifts a standard step to engineering', () => {
-  const d = decideRoute(cfg, resolved, sig({ text: '帮我看看', escalations: 1 }))
+  const d = decideRoute(cfg, resolved, sig({ text: 'Take a look', escalations: 1 }))
   assert.equal(d.stepClass, 'engineering')
   assert.equal(d.effort, 'high')
 })
 
 test('evidence escalation is capped, and capped max falls back', () => {
-  const d = decideRoute(cfg, resolved, sig({ text: '帮我看看', escalations: 99 }))
+  const d = decideRoute(cfg, resolved, sig({ text: 'Take a look', escalations: 99 }))
   assert.equal(d.stepClass, 'hard')
   assert.equal(d.effort, 'high')
 })
 
 test('escalation and carry only lift real work', () => {
   // Cheap intent and a plain tool loop are not "real work": nothing lifts them.
-  assert.equal(decideRoute(cfg, resolved, sig({ text: '翻译这句话', carry: 1 })).stepClass, 'trivial')
-  assert.equal(decideRoute(cfg, resolved, sig({ text: '帮我看看', carry: 1 })).stepClass, 'standard')
+  assert.equal(decideRoute(cfg, resolved, sig({ text: 'Translate this sentence', carry: 1 })).stepClass, 'trivial')
+  assert.equal(decideRoute(cfg, resolved, sig({ text: 'Take a look', carry: 1 })).stepClass, 'standard')
   assert.equal(decideRoute(cfg, resolved, sig({ text: 'continue', toolCalls: 2, carry: 1 })).stepClass, 'standard')
   // Once the brief really earns engineering, carry does lift it further.
   const carried = decideRoute(cfg, resolved, sig({ text: 'refactor the parser', carry: 1 }))
@@ -228,10 +228,10 @@ test('a tool-heavy quiet step keeps its brief class however many calls it makes'
 })
 
 test('escalation lifts standard -> engineering -> high and never reaches max while allowMax is false', () => {
-  const one = decideRoute(cfg, resolved, sig({ text: '帮我看看', toolCalls: 1, escalations: 1 }))
+  const one = decideRoute(cfg, resolved, sig({ text: 'Take a look', toolCalls: 1, escalations: 1 }))
   assert.equal(one.stepClass, 'engineering')
   assert.equal(one.effort, 'high')
-  const two = decideRoute(cfg, resolved, sig({ text: '帮我看看', toolCalls: 1, escalations: 2 }))
+  const two = decideRoute(cfg, resolved, sig({ text: 'Take a look', toolCalls: 1, escalations: 2 }))
   assert.equal(two.stepClass, 'hard')
   assert.equal(two.effort, 'high')
   assert.equal(two.clamped, true)
@@ -242,12 +242,12 @@ test('escalation lifts standard -> engineering -> high and never reaches max whi
   assert.equal(eng.stepClass, 'hard')
   assert.equal(eng.effort, 'high')
   // ...while allowMax still opens it.
-  const open = decideRoute(normalizeConfig({ allowMax: true }), resolved, sig({ text: '帮我看看', escalations: 2 }))
+  const open = decideRoute(normalizeConfig({ allowMax: true }), resolved, sig({ text: 'Take a look', escalations: 2 }))
   assert.equal(open.effort, 'max')
 })
 
 test('property: auto mode never emits max across a signal sweep', () => {
-  const corpus = ['翻译 hello', 'continue', BRIEF, 'explain this', 'refactor the parser and add tests']
+  const corpus = ['Translate hello', 'continue', BRIEF, 'explain this', 'refactor the parser and add tests']
   for (const text of corpus) {
     for (const toolCalls of [0, 3, 50]) {
       for (const escalations of [0, 1, 2]) {
@@ -269,7 +269,7 @@ test('the auto-max invariant survives a hostile route table', () => {
       hard: { effort: 'max' },
     },
   })
-  for (const text of ['翻译 hi', '帮我看看', 'continue', BRIEF]) {
+  for (const text of ['Translate hi', 'Take a look', 'continue', BRIEF]) {
     const d = decideRoute(hostile, resolved, sig({ text, toolCalls: 4 }))
     assert.notEqual(d.effort, 'max')
     assert.equal(d.effort, 'high')
@@ -367,7 +367,7 @@ test('documented presets and shipped routes', () => {
 })
 
 test('classifyStep only ever returns a known class', () => {
-  const corpus = ['', '翻译 hi', '帮我看看', 'continue', BRIEF, FENCE + 'js' + FENCE, 'a'.repeat(400)]
+  const corpus = ['', 'Translate hi', 'Take a look', 'continue', BRIEF, FENCE + 'js' + FENCE, 'a'.repeat(400)]
   for (const text of corpus) {
     for (const toolCalls of [0, 9]) {
       assert.ok(STEP_CLASSES.includes(classifyStep(sig({ text, toolCalls }), cfg).stepClass))

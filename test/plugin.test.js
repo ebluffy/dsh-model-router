@@ -83,8 +83,8 @@ test('a cheap step stays cheap without disabling thinking', async () => {
   apply(ctx, {})
   const { agent, state } = makeAgent()
 
-  emit(handlers, 'agent/inbox/claimed', { agent, turn: 1, message: { content: '翻译这句话：hello world' } })
-  state.messages = [userText('翻译这句话：hello world')]
+  emit(handlers, 'agent/inbox/claimed', { agent, turn: 1, message: { content: 'Translate this sentence: hello world' } })
+  state.messages = [userText('Translate this sentence: hello world')]
 
   const out = await request(handlers, { agent, turn: 1, step: 0 }, async () => resolved())
   assert.equal(out.model, 'deepseek-flash')
@@ -96,8 +96,8 @@ test('a hand-written off route cannot disable thinking for a tool loop', async (
   apply(ctx, { routes: { trivial: { effort: 'off' } } })
   const { agent, state } = makeAgent()
 
-  emit(handlers, 'agent/inbox/claimed', { agent, turn: 1, message: { content: '翻译这句话：hello world' } })
-  state.messages = [userText('翻译这句话：hello world')]
+  emit(handlers, 'agent/inbox/claimed', { agent, turn: 1, message: { content: 'Translate this sentence: hello world' } })
+  state.messages = [userText('Translate this sentence: hello world')]
 
   const out = await request(handlers, { agent, turn: 1, step: 0 }, async () => resolved())
   assert.equal(out.reasoningEffort, 'low')
@@ -108,8 +108,8 @@ test('allowThinkingOff keeps a non-thinking session on off', async () => {
   apply(ctx, { allowThinkingOff: true, routes: { trivial: { effort: 'off' } } })
   const { agent, state } = makeAgent()
 
-  emit(handlers, 'agent/inbox/claimed', { agent, turn: 1, message: { content: '翻译这句话：hello world' } })
-  state.messages = [userText('翻译这句话：hello world')]
+  emit(handlers, 'agent/inbox/claimed', { agent, turn: 1, message: { content: 'Translate this sentence: hello world' } })
+  state.messages = [userText('Translate this sentence: hello world')]
 
   const out = await request(handlers, { agent, turn: 1, step: 0 }, async () => resolved())
   assert.equal(out.reasoningEffort, 'off')
@@ -171,8 +171,8 @@ test('repeated failing tool calls escalate within the task, and the next task re
   assert.equal(escalated.model, 'deepseek-flash')
   assert.equal(escalated.reasoningEffort, 'high')
 
-  emit(handlers, 'agent/inbox/claimed', { agent, turn: 2, message: { content: '翻译 hi' } })
-  state.messages = state.messages.concat([userText('翻译 hi')])
+  emit(handlers, 'agent/inbox/claimed', { agent, turn: 2, message: { content: 'Translate hi' } })
+  state.messages = state.messages.concat([userText('Translate hi')])
   const fresh = await request(handlers, { agent, turn: 2, step: 5 }, async () => resolved())
   assert.equal(fresh.reasoningEffort, 'low')
 })
