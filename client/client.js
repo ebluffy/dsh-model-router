@@ -664,11 +664,11 @@ window.__ModuleLoader__.load({
 				}
 
 				const isRu = (typeof navigator !== "undefined" && navigator.language && navigator.language.startsWith("ru")) || (state && state.locale === "ru")
-				const remainingWord = isRu ? "Остаток: " : "Remaining: "
-				const tokensWord = isRu ? " токенов" : " tokens"
 				const title = tb.unlimited
-					? (isRu ? "Остаток: неограниченно" : "Remaining: unlimited")
-					: (remainingWord + (tb.formattedAvailable || "0") + tokensWord + (tb.totalTokens ? (" (" + pct + "%)") : ""))
+					? (isRu ? "Осталось: неограниченно" : "Remaining: unlimited")
+					: (isRu
+						? ("Осталось: " + (tb.formattedAvailable || "0") + " токенов")
+						: ((tb.formattedAvailable || "0") + " tokens remaining"))
 
 				const bar = tb.unlimited ? null : h("span", {
 					style: {

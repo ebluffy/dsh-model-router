@@ -214,3 +214,57 @@ test('tokenBalanceScoreDelta applies score penalties and bonuses', () => {
   // Healthy (50%) -> bonus of -5
   assert.equal(tokenBalanceScoreDelta({ isTracked: true, isLow: false, isExhausted: false, remainingFraction: 0.5 }), -5)
 })
+
+test('resolveProviderCredentials falls back to DSH credentials ref when env is unset', () => {
+  const credentials = {
+    AIHOPE_API_KEY: 'dsh-creds-aihope-key',
+    CUSTOM_KEY: 'dsh-creds-custom',
+  }
+  const env = {} // Empty env
+
+  const creds = resolveProviderCredentials(
+    'aihope',
+    { apiKeyEnv: 'AIHOPE_API_KEY', baseURL: 'https://aihope.fun/v1' },
+    {},
+    env,
+    credentials
+  )
+  assert.equal(creds.apiKey, 'dsh-creds-aihope-key')
+  assert.equal(creds.baseURL, 'https://aihope.fun/v1')
+})
+
+test('fetchTokenBalance falls back to OneAPI subscription when token endpoint returns 404', async () => {
+  const mockFetch = async (url) => {
+    if (url.includes('/api/usage/token')) {
+      return { ok: false, status: 404 }
+    }
+    if (url.includes('/subscription')) {
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ hard_limit_usd: 100 }),
+      }
+    }
+    if (url.includes('/usage')) {
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ total_usage: 25 }),
+      }
+    }
+    return { ok: false, status: 404 }
+  }
+
+  const creds = {
+    providerId: 'oneapi_fallback',
+    baseURL: 'https://proxy.example.com/v1',
+    apiKey: 'sk-test',
+  }
+
+  const res = await fetchTokenBalance(creds, mockFetch, 5000)
+  assert.equal(res.isTracked, true)
+  assert.equal(res.totalTokens, 100)
+  assert.equal(res.availableTokens, 75)
+  assert.equal(res.level, 'high')
+})
+
