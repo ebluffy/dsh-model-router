@@ -636,24 +636,66 @@ window.__ModuleLoader__.load({
 				const family = slug.includes("claude") ? "anthropic" : (slug.includes("gemini") ? "google" : (slug.includes("gpt") ? "openai" : null))
 				if (!family) return null
 				const accounts = state.quotas.accounts || []
-				const acc = accounts.find((a) => a.enabled) || accounts[0]
+				if (accounts.length === 0) return null
+
+				const activeIds = state.quotas.activeAccountIds || {}
+				const activeId = activeIds[family]
+				let acc = accounts.find((a) => a.id === activeId && a.enabled)
+				if (!acc && state.quotas.lastActiveAccountId) {
+					acc = accounts.find((a) => a.id === state.quotas.lastActiveAccountId && a.enabled)
+				}
+				if (!acc && state.quotas.primaryAccountId) {
+					acc = accounts.find((a) => a.id === state.quotas.primaryAccountId && a.enabled)
+				}
+				if (!acc) {
+					acc = accounts.find((a) => a.enabled) || accounts[0]
+				}
+
+				const now = Date.now()
+				const isHealthy = (a) => {
+					if (!a || !a.enabled) return false
+					const cd = a.cooldowns && a.cooldowns[family]
+					if (cd && typeof cd.cooldownUntil === "number" && cd.cooldownUntil > now) return false
+					const q = a.quotas && a.quotas[family]
+					if (!q || typeof q.remainingFraction !== "number") return true
+					return q.remainingFraction > 0.02
+				}
+
+				// If chosen account is exhausted (<= 2%) or in cooldown, rotate to any healthy enabled account
+				if (!isHealthy(acc)) {
+					const alt = accounts.find((a) => isHealthy(a))
+					if (alt) acc = alt
+				}
+
 				const q = acc && acc.quotas && acc.quotas[family]
 				if (!q || typeof q.remainingFraction !== "number") return null
 				const pct = Math.round(q.remainingFraction * 100)
 				const isLow = q.remainingFraction <= (state.quotas.reserveThreshold || 0.20)
+				const cd = acc && acc.cooldowns && acc.cooldowns[family]
+				const inCd = !!(cd && typeof cd.cooldownUntil === "number" && cd.cooldownUntil > now)
+
+				const accIdx = accounts.indexOf(acc) >= 0 ? (accounts.indexOf(acc) + 1) : null
+				const accTag = (accounts.length > 1 && accIdx) ? (" • #" + accIdx) : ""
+				const accName = acc.email || acc.alias || ("Account " + accIdx)
+
+				let title = accName + ": " + (inCd ? ("cooldown until " + new Date(cd.cooldownUntil).toLocaleTimeString()) : ("Remaining 5h quota: " + pct + "%"))
+				if (!inCd && isLow) {
+					title += " (protected by auto-reserve threshold)"
+				}
+
 				return h("span", {
 					className: "mr-tag",
-					title: isLow ? ("Low quota (" + pct + "%): protected by auto-reserve threshold") : ("Remaining 5h quota: " + pct + "%"),
+					title: title,
 					style: {
-						color: isLow ? "#f87171" : "#34d399",
-						borderColor: isLow ? "rgba(248, 113, 113, 0.4)" : "rgba(52, 211, 153, 0.4)",
+						color: inCd || isLow ? "#f87171" : "#34d399",
+						borderColor: inCd || isLow ? "rgba(248, 113, 113, 0.4)" : "rgba(52, 211, 153, 0.4)",
 						borderWidth: "1px",
 						borderStyle: "solid",
 						borderRadius: "4px",
 						padding: "1px 5px",
 						fontWeight: "600",
 					},
-				}, pct + "% quota" + (isLow ? " ⚠️" : ""))
+				}, inCd ? ("cooldown ⏳" + accTag) : (pct + "% quota" + (isLow ? " ⚠️" : "") + accTag))
 			}
 			const savePresets = (next, after) => run("/presets", { presets: next }, after)
 			const beginNew = () => { setEditing({ original: null, name: "", match: [], weights: {} }); setCustomWord(""); setView("preset") }

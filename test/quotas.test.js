@@ -160,4 +160,35 @@ test('buildQuotaSummary formats telemetry for the client', () => {
   assert.equal(summary.accounts.length, 3)
   assert.equal(summary.reserveThreshold, DEFAULT_RESERVE_THRESHOLD)
   assert.equal(summary.accounts[0].quotas.anthropic.remainingFraction, 0.172)
+  assert.equal(summary.primaryAccountId, undefined)
+  assert.equal(summary.activeAccountIds.anthropic, 'acc_primary')
 })
+
+test('resolveModelQuota rotates to backup account when active account is exhausted', () => {
+  const pool = {
+    accounts: [
+      {
+        id: 'acc_primary',
+        email: 'primary@example.com',
+        enabled: true,
+        quotas: { anthropic: { remainingFraction: 0 } },
+        cooldowns: {},
+      },
+      {
+        id: 'acc_secondary',
+        email: 'secondary@example.com',
+        enabled: true,
+        quotas: { anthropic: { remainingFraction: 1.0 } },
+        cooldowns: {},
+      },
+    ],
+    activeAccountIds: { anthropic: 'acc_primary' },
+  }
+  const q = resolveModelQuota('antigravity/claude-sonnet-4-6', pool)
+  assert.equal(q.accountId, 'acc_secondary')
+  assert.equal(q.accountEmail, 'secondary@example.com')
+  assert.equal(q.remainingFraction, 1.0)
+  assert.equal(q.status, 'healthy')
+  assert.equal(q.isExhausted, false)
+})
+
