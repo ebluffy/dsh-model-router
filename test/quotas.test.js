@@ -92,9 +92,13 @@ test('resolveModelQuota tracks antigravity models and ignores other providers', 
   assert.equal(claude.isTracked, true)
   assert.equal(claude.family, 'anthropic')
   assert.equal(claude.remainingFraction, 0.172)
-  assert.equal(claude.status, 'reserve')
-  assert.equal(claude.isLowQuota, true)
+  assert.equal(claude.status, 'healthy') // 17.2% is healthy with 2% threshold
+  assert.equal(claude.isLowQuota, false)
   assert.equal(claude.isExhausted, false)
+
+  const claudeCustomReserve = resolveModelQuota('antigravity/claude-opus-4-6-thinking', MOCK_POOL, Date.now(), 0.20)
+  assert.equal(claudeCustomReserve.status, 'reserve')
+  assert.equal(claudeCustomReserve.isLowQuota, true)
 
   const gemini = resolveModelQuota('antigravity/gemini-3.8-flash', MOCK_POOL)
   assert.equal(gemini.isTracked, true)
@@ -136,8 +140,8 @@ test('resolveModelQuota detects exhausted and cooldown models', () => {
 })
 
 test('quotaScoreDelta penalizes reserve models and rewards healthy ones', () => {
-  const claudeQ = resolveModelQuota('antigravity/claude-opus-4-6-thinking', MOCK_POOL)
-  const penalty = quotaScoreDelta(claudeQ)
+  const claudeReserved = resolveModelQuota('antigravity/claude-opus-4-6-thinking', MOCK_POOL, Date.now(), 0.20)
+  const penalty = quotaScoreDelta(claudeReserved)
   assert.equal(penalty, LOW_QUOTA_PENALTY) // 80 points penalty
 
   const geminiQ = resolveModelQuota('antigravity/gemini-3.8-flash', MOCK_POOL)
@@ -164,7 +168,7 @@ test('buildQuotaSummary formats telemetry for the client', () => {
   assert.equal(summary.activeAccountIds.anthropic, 'acc_primary')
 })
 
-test('resolveModelQuota rotates to backup account when active account is exhausted', () => {
+test('resolveModelQuota reports recorded account until AGY persists a switch', () => {
   const pool = {
     accounts: [
       {
@@ -185,10 +189,14 @@ test('resolveModelQuota rotates to backup account when active account is exhaust
     activeAccountIds: { anthropic: 'acc_primary' },
   }
   const q = resolveModelQuota('antigravity/claude-sonnet-4-6', pool)
-  assert.equal(q.accountId, 'acc_secondary')
-  assert.equal(q.accountEmail, 'secondary@example.com')
-  assert.equal(q.remainingFraction, 1.0)
-  assert.equal(q.status, 'healthy')
-  assert.equal(q.isExhausted, false)
+  assert.equal(q.accountId, 'acc_primary')
+  assert.equal(q.remainingFraction, 0)
+  assert.equal(q.status, 'exhausted')
+  assert.equal(q.isExhausted, true)
+
+  pool.activeAccountIds.anthropic = 'acc_secondary'
+  const switched = resolveModelQuota('antigravity/claude-sonnet-4-6', pool)
+  assert.equal(switched.accountId, 'acc_secondary')
+  assert.equal(switched.status, 'healthy')
 })
 

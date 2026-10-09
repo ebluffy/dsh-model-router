@@ -6,16 +6,17 @@
   - Automatically discovers OpenAI-compatible providers configured in `cordis.patch.yml` / `cordis.yml` (e.g. `@deepseek-ai/dsh-llm-pi-ai`), including `aihope`, New API, One API, OpenRouter, and standard proxies.
   - Safely resolves credentials via `apiKey`, `apiKeyEnv`, DSH credentials store (`~/.dsh/.credentials.yaml`), or conventional environment variables (`<PROVIDER>_API_KEY`).
   - Queries balance endpoints with caching (`/api/usage/token`, `/v1/dashboard/billing/subscription`, `/api/v1/credits`, etc.).
-  - Normalizes balances into clear health levels (`high`, `normal`, `low`, `exhausted`, `unlimited`).
+  - Normalizes balances into clear health levels based on absolute token reserves: `high` (>= 50M tokens), `normal` (10M - 50M tokens), `low ⚠️` (< 10M tokens), `exhausted ❌` (<= 0), and `high ∞` (unlimited).
 - **Token Reserve Protection in Routing (`lib/routing.js`)**:
-  - Automatically applies reserve penalty (`-80`) to candidates with low token balances (`<= 20%` or `<= 100k tokens`) to spare remaining quota for manual prompts.
+  - Automatically applies reserve penalty (`-80`) to candidates with low token balances (< 10M tokens or <= 20%) to spare remaining quota for manual prompts.
   - Excludes exhausted providers from automatic selection while healthy alternatives remain in the pool.
-- **UI Token Telemetry & Tooltips (`client/client.js`)**:
-  - Compact badge in the model pool with level-coded colors (`high`, `normal`, `low ⚠️`, `exhausted ❌`, `high ∞`) and an inline mini progress bar.
-  - Hover tooltip indicates exact remaining tokens (e.g. `"Осталось: 48,909,240 токенов"` / `"48,909,240 tokens remaining"`).
+- **UI Token Telemetry & English Tooltips (`client/client.js`)**:
+  - Compact badge in the model pool with level-coded colors (`high`, `normal`, `low ⚠️`, `exhausted ❌`, `high ∞`) and an inline mini progress bar normalized against active package reserves.
+  - Hover tooltip indicates exact remaining tokens in universal English (e.g. `"Remaining: 48,909,240 tokens"` / `"Remaining: unlimited tokens"`).
   - Zero credential leakage: API keys are never exposed in UI state, logs, or client responses.
-- **Multi-Account Quota Resolution**:
-  - Properly displays active account tag (`• #1` / `• #2`) and rotates to healthy accounts in the UI when an active account is exhausted or in cooldown.
+- **Antigravity 5-Hour Quota & Multi-Account Alignment (`lib/quotas.js`)**:
+  - Default Antigravity reserve threshold aligned with 5-hour reset cycle at 2% (`0.02`), allowing models to be fully utilized without premature demotion.
+  - Multi-account badge correctly reflects active and healthy account indices (`• #1` / `• #2`), seamlessly aligned with `dsh-agy-link` sequential drain.
 
 ## 0.14.7
 

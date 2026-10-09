@@ -731,12 +731,10 @@ window.__ModuleLoader__.load({
 					if (!a || !a.enabled) return false
 					const cd = a.cooldowns && a.cooldowns[family]
 					if (cd && typeof cd.cooldownUntil === "number" && cd.cooldownUntil > now) return false
-					const q = a.quotas && a.quotas[family]
-					if (!q || typeof q.remainingFraction !== "number") return true
-					return q.remainingFraction > 0.02
+					const qf = a.quotas && a.quotas[family]
+					if (!qf || typeof qf.remainingFraction !== "number") return true
+					return qf.remainingFraction > (state.quotas.reserveThreshold || 0.02)
 				}
-
-				// If chosen account is exhausted (<= 2%) or in cooldown, rotate to any healthy enabled account
 				if (!isHealthy(acc)) {
 					const alt = accounts.find((a) => isHealthy(a))
 					if (alt) acc = alt
@@ -745,7 +743,7 @@ window.__ModuleLoader__.load({
 				const q = acc && acc.quotas && acc.quotas[family]
 				if (!q || typeof q.remainingFraction !== "number") return null
 				const pct = Math.round(q.remainingFraction * 100)
-				const isLow = q.remainingFraction <= (state.quotas.reserveThreshold || 0.20)
+				const isLow = q.remainingFraction <= (state.quotas.reserveThreshold || 0.02)
 				const cd = acc && acc.cooldowns && acc.cooldowns[family]
 				const inCd = !!(cd && typeof cd.cooldownUntil === "number" && cd.cooldownUntil > now)
 
@@ -755,7 +753,7 @@ window.__ModuleLoader__.load({
 
 				let title = accName + ": " + (inCd ? ("cooldown until " + new Date(cd.cooldownUntil).toLocaleTimeString()) : ("Remaining 5h quota: " + pct + "%"))
 				if (!inCd && isLow) {
-					title += " (protected by auto-reserve threshold)"
+					title += " (exhausted/low quota)"
 				}
 
 				return h("span", {
