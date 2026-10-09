@@ -162,3 +162,22 @@ test('control scopes and manual-override defaults are the documented ones', () =
   assert.deepEqual(manualOverridePolicy({}), { yieldOnManual: true, resumeOnNextCommand: true })
   assert.deepEqual(manualOverridePolicy({ manualOverride: { yieldOnManual: false } }), { yieldOnManual: false, resumeOnNextCommand: true })
 })
+
+test('token balance protection penalizes low balance and excludes exhausted candidates', () => {
+  const pool = [
+    { id: 'aihope/gpt-6-luna', provider: 'aihope', model: 'gpt-6-luna', tier: 'cheap', cost: 0.25, tags: [] },
+    { id: 'deepseek/chat', provider: 'deepseek-official', model: 'deepseek-chat', tier: 'cheap', cost: 0.14, tags: [] },
+  ]
+  const tokenBalances = {
+    aihope: { isTracked: true, isExhausted: true, level: 'exhausted' },
+  }
+  const picked = chooseEntry(pool, cfg(), { tokenBalances }, {})
+  assert.equal(picked.entry.id, 'deepseek/chat')
+
+  // When low balance, penalty of -80 demotes it
+  const lowBalances = {
+    aihope: { isTracked: true, isLow: true, level: 'low', remainingFraction: 0.1 },
+  }
+  const pickedLow = chooseEntry(pool, cfg(), { tokenBalances: lowBalances }, {})
+  assert.equal(pickedLow.entry.id, 'deepseek/chat')
+})

@@ -627,8 +627,85 @@ window.__ModuleLoader__.load({
 								: (entry.tags || []).concat(["vision"]),
 						}),
 					}, t.vision),
-					quotaBadge(entry.id)
+					(entry.id && entry.id.startsWith("antigravity/")) ? quotaBadge(entry.id) : tokenBalanceBadge(entry)
 				)
+			}
+			const tokenBalanceBadge = (entry) => {
+				if (!state || !state.tokenBalances || !entry) return null
+				const pid = entry.provider || (entry.id && entry.id.split("/")[0]) || ""
+				let tb = state.tokenBalances[pid] || state.tokenBalances[entry.id]
+				if (!tb && pid.startsWith("modlens-")) {
+					tb = state.tokenBalances[pid.slice(8)]
+				}
+				if (!tb || !tb.isTracked || tb.status !== "ok") return null
+
+				const level = tb.level || "normal"
+				const isExhausted = tb.isExhausted || level === "exhausted"
+				const isLow = tb.isLow || level === "low"
+				const isHigh = tb.unlimited || level === "high"
+				const pct = Math.round((tb.remainingFraction !== null && tb.remainingFraction !== undefined ? tb.remainingFraction : 1) * 100)
+
+				let color = "#38bdf8"
+				let borderColor = "rgba(56, 189, 248, 0.4)"
+				let label = "normal"
+
+				if (isExhausted) {
+					color = "#ef4444"
+					borderColor = "rgba(239, 68, 68, 0.4)"
+					label = "exhausted ❌"
+				} else if (isLow) {
+					color = "#f87171"
+					borderColor = "rgba(248, 113, 113, 0.4)"
+					label = "low ⚠️"
+				} else if (isHigh) {
+					color = "#34d399"
+					borderColor = "rgba(52, 211, 153, 0.4)"
+					label = tb.unlimited ? "high ∞" : "high"
+				}
+
+				const isRu = (typeof navigator !== "undefined" && navigator.language && navigator.language.startsWith("ru")) || (state && state.locale === "ru")
+				const remainingWord = isRu ? "Остаток: " : "Remaining: "
+				const tokensWord = isRu ? " токенов" : " tokens"
+				const title = tb.unlimited
+					? (isRu ? "Остаток: неограниченно" : "Remaining: unlimited")
+					: (remainingWord + (tb.formattedAvailable || "0") + tokensWord + (tb.totalTokens ? (" (" + pct + "%)") : ""))
+
+				const bar = tb.unlimited ? null : h("span", {
+					style: {
+						display: "inline-block",
+						width: "20px",
+						height: "4px",
+						borderRadius: "2px",
+						background: "rgba(255, 255, 255, 0.15)",
+						marginLeft: "5px",
+						verticalAlign: "middle",
+						overflow: "hidden",
+					},
+				}, h("span", {
+					style: {
+						display: "block",
+						width: Math.max(3, Math.min(100, pct)) + "%",
+						height: "100%",
+						background: color,
+						borderRadius: "2px",
+					},
+				}))
+
+				return h("span", {
+					className: "mr-tag",
+					title: title,
+					style: {
+						display: "inline-flex",
+						alignItems: "center",
+						color: color,
+						borderColor: borderColor,
+						borderWidth: "1px",
+						borderStyle: "solid",
+						borderRadius: "4px",
+						padding: "1px 5px",
+						fontWeight: "600",
+					},
+				}, label, bar)
 			}
 			const quotaBadge = (id) => {
 				if (!state || !state.quotas || !id || !id.startsWith("antigravity/")) return null

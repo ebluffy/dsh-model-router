@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.14.8
+
+- **Universal API Key Token Balance Tracking (`lib/token-balance.js`)**:
+  - Automatically discovers OpenAI-compatible providers configured in `cordis.patch.yml` / `cordis.yml` (e.g. `@deepseek-ai/dsh-llm-pi-ai`), including `aihope`, New API, One API, OpenRouter, and standard proxies.
+  - Safely resolves credentials via `apiKey`, `apiKeyEnv`, or conventional environment variables (`<PROVIDER>_API_KEY`).
+  - Queries balance endpoints with caching (`/api/usage/token`, `/api/v1/credits`, etc.).
+  - Normalizes balances into clear health levels (`high`, `normal`, `low`, `exhausted`, `unlimited`).
+- **Token Reserve Protection in Routing (`lib/routing.js`)**:
+  - Automatically applies reserve penalty (`-80`) to candidates with low token balances (`<= 20%` or `<= 100k tokens`) to spare remaining quota for manual prompts.
+  - Excludes exhausted providers from automatic selection while healthy alternatives remain in the pool.
+- **UI Token Telemetry & Tooltips (`client/client.js`)**:
+  - Compact badge in the model pool with level-coded colors and an inline mini progress bar.
+  - Hover tooltip indicates exact remaining balance (e.g. `"Остаток: 50,194,340 токенов (32%)"` / `"Remaining: 50,194,340 tokens (32%)"`).
+  - Zero credential leakage: API keys are never exposed in UI state, logs, or client responses.
+- **Multi-Account Quota Resolution**:
+  - Properly displays active account tag (`• #1` / `• #2`) and rotates to healthy accounts in the UI when an active account is exhausted or in cooldown.
+
 ## 0.14.7
 
 - **Step-Level Intelligent Routing (3-Tier Action Mapping)**:
