@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.6
+
+- Fix duplicate model picker button conflict when theme plugins (such as `dsh-claude-style`) are installed.
+- Suppress injected `.dsh-claude-model-btn` and ensure `ModelRouterControl` retains visibility.
+- Add automatic DOM cleanup of conflicting skin buttons.
+
 ## 0.14.5
 
 - Unified Cursor-style model picker and Auto router control in `conversation.input.model`: displays `⚡ Auto` badge when dynamic routing is active, and provides a top `⚡ Auto (Smart Router)` row in the dropdown.
